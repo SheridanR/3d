@@ -10,7 +10,7 @@ static vec4_t project(
 	const mat4x4_t* projview,
 	const vec4_t* window
 	) {
-	vec4_t result = *world;
+	vec4_t result = *world; result.w = 1.f;
 	mul_mat_vec4(&result, model, &result);
 	mul_mat_vec4(&result, projview, &result);
 	div_vec4(&result, &result, &vec4(result.w));
@@ -47,4 +47,6 @@ static mat4x4_t perspective(float fov, float aspect, float clip_near) {
 void camera_update(camera_t* camera) {
 	camera->proj = perspective(camera->fov, (float)XRES / (float)YRES, (float)CAMERA_CLIP_NEAR);
 	camera->view = mat4x4(1.f);
+	camera->view.w = camera->pos;
+	camera->view.w.w = 1.f;
 }

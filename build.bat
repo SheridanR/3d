@@ -15,4 +15,4 @@ external/lib/x64/SDL2main.lib ^
 external/lib/x64/SDL2_image.lib ^
 /Fe"3d.exe" ^
 /link ^
-/SUBSYSTEM:WINDOWS
+/SUBSYSTEM:CONSOLE
