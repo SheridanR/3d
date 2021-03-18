@@ -1,16 +1,18 @@
-#include <SDL.h>
+#include "draw.h"
+#include "main.h"
+#include "camera.h"
+#include "crap.h"
 #include <stdint.h>
 #include <string.h>
-#include "main.h"
-#include "crap.h"
-#include "camera.h"
+
+window_t screen;
 
 uint32_t color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	return ((uint32_t)a << 24) | ((uint32_t)r << 16) | ((uint32_t)g << 8) | ((uint32_t)b);
 }
 
 void pixel(uint32_t x, uint32_t y, uint32_t color) {
-	*(uint32_t*)(&((uint8_t*)surface->pixels)[y * surface->pitch + x * surface->format->BytesPerPixel]) = color;
+	screen.pixels[y * screen.width + x] = color;
 }
 
 void check_pixel(uint32_t x, uint32_t y, uint32_t color) {
@@ -22,7 +24,7 @@ void check_pixel(uint32_t x, uint32_t y, uint32_t color) {
 }
 
 void clear() {
-	memset(surface->pixels, color(0, 0, 0, 255), surface->pitch * surface->h);
+	memset(screen.pixels, color(0, 0, 0, 255), screen.width * screen.height * sizeof(uint32_t));
 }
 
 void draw(const camera_t* camera) {
@@ -36,9 +38,7 @@ void draw(const camera_t* camera) {
 		float dot = dot_vec4(&diff, &(vec4_t){0.f, 0.f, -1.f, 0.f});
 		if (dot > 0.f) {
 			vec4_t sp = world_to_screen_coords(wp, camera);
-			SDL_LockSurface(surface);
 			check_pixel(sp.x, sp.y, color(255, 255, 255, 255));
-			SDL_UnlockSurface(surface);
 		}
 	}
 }

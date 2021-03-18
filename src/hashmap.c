@@ -1,6 +1,6 @@
+#include "hashmap.h"
 #include <string.h>
 #include <stdint.h>
-#include "hashmap.h"
 
 hashmap_t hashmapNew(void* (*alloc)(size_t), void (*free)(void*), size_t keySize, size_t valueSize, size_t (*hash)(void*, size_t)) {
     hashmap_t hashmap;

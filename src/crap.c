@@ -1,8 +1,11 @@
-#include <SDL.h>
+#include "crap.h"
 #include "main.h"
+#include "sim.h"
+#include "draw.h"
+#include <SDL.h>
 
-SDL_Window* window;
-SDL_Surface* surface;
+static SDL_Window* window;
+static SDL_Surface* surface;
 bool keystatus[SDL_NUM_SCANCODES] = { false };
 
 void init() {
@@ -16,6 +19,9 @@ void init() {
 		SDL_WINDOW_SHOWN
 	);
 	surface = SDL_GetWindowSurface(window);
+	screen.pixels = (uint32_t*)surface->pixels;
+	screen.width = (int)surface->w;
+	screen.height = (int)surface->h;
 }
 
 void refresh() {

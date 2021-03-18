@@ -6,6 +6,8 @@ src/hashmap.c ^
 src/main.c ^
 src/matrix.c ^
 src/quat.c ^
+src/sim.c ^
+src/timer.c ^
 src/vec4.c ^
 src/vector.c ^
 /Iexternal/include ^

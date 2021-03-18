@@ -1,8 +1,8 @@
-#include <math.h>
 #include "vec4.h"
 #include "matrix.h"
 #include "camera.h"
 #include "main.h"
+#include <math.h>
 
 static vec4_t project(
 	const vec4_t* world,

@@ -1,6 +1,6 @@
+#include "vector.h"
 #include <string.h>
 #include <stdint.h>
-#include "vector.h"
 
 vector_t vectorNew(void* (*alloc)(size_t), void (*free)(void*), size_t elementSize) {
     vector_t vector;
