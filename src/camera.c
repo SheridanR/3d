@@ -11,8 +11,8 @@ static vec4_t project(
 	const vec4_t* window
 	) {
 	vec4_t result = *world; result.w = 1.f;
-	mul_mat_vec4(&result, model, &result);
-	mul_mat_vec4(&result, projview, &result);
+	mul_mat_vec4(&result, model, &vec4_copy(result));
+	mul_mat_vec4(&result, projview, &vec4_copy(result));
 	div_vec4(&result, &result, &vec4(result.w));
 	mul_vec4(&result, &result, &vec4(0.5f));
 	add_vec4(&result, &result, &vec4(0.5f));

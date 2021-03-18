@@ -26,11 +26,19 @@ void clear() {
 }
 
 void draw(const camera_t* camera) {
-
-	vec4_t p = vec4(0.f);
-	vec4_t sp = world_to_screen_coords(&p, camera);
-
-	SDL_LockSurface(surface);
-	check_pixel(sp.x, sp.y, color(255, 255, 255, 255));
-	SDL_UnlockSurface(surface);
+	vec4_t p[4];
+	int count = sizeof(p) / sizeof(p[0]);
+	for (int c = 0; c < count; ++c) {
+		vec4_t* wp = &p[c];
+		*wp = (vec4_t){0.f, 0.f, (float)c, 0.f};
+		vec4_t diff;
+		sub_vec4(&diff, wp, &camera->pos);
+		float dot = dot_vec4(&diff, &(vec4_t){0.f, 0.f, -1.f, 0.f});
+		if (dot > 0.f) {
+			vec4_t sp = world_to_screen_coords(wp, camera);
+			SDL_LockSurface(surface);
+			check_pixel(sp.x, sp.y, color(255, 255, 255, 255));
+			SDL_UnlockSurface(surface);
+		}
+	}
 }
