@@ -46,7 +46,9 @@ static mat4x4_t perspective(float fov, float aspect, float clip_near) {
 
 void camera_update(camera_t* camera) {
 	camera->proj = perspective(camera->fov, (float)XRES / (float)YRES, (float)CAMERA_CLIP_NEAR);
-	camera->view = mat4x4(1.f);
-	camera->view.w = camera->pos;
-	camera->view.w.w = 1.f;
+	mat4x4_t rotate = quat_to_mat(&camera->ang);
+	mat4x4_t translate = mat4x4(1.f);
+	translate.w = camera->pos;
+	translate.w.w = 1.f;
+	mul_mat(&camera->view, &rotate, &translate);
 }

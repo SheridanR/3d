@@ -43,3 +43,18 @@ vec4_t* pow_vec4(vec4_t* result, const vec4_t* v, float f) {
 float dot_vec4(const vec4_t* a, const vec4_t* b) {
 	return a->x * b->x + a->y * b->y + a->z * b->z + a->w * b->w;
 }
+
+vec4_t* cross_vec3(vec4_t* result, const vec4_t* a, const vec4_t* b) {
+	result->x = a->y * b->z - a->z * b->y;
+	result->y = a->z * b->x - a->x * b->z;
+	result->z = a->x * b->y - a->y * b->x;
+	return result;
+}
+
+vec4_t* cross_vec4(vec4_t* result, const vec4_t* a, const vec4_t* b) {
+	result->x = a->y * b->z - a->z * b->y;
+	result->y = a->z * b->w - a->w * b->z;
+	result->z = a->w * b->x - a->x * b->w;
+	result->w = a->x * b->y - a->y * b->x;
+	return result;
+}
