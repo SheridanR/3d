@@ -7,6 +7,7 @@ src/matrix.c ^
 src/quat.c ^
 src/sim.c ^
 src/timer.c ^
+src/triangle.c ^
 src/vec4.c ^
 /Iexternal/include ^
 shell32.lib ^

@@ -12,8 +12,10 @@ camera_t camera;
 void setup() {
 	running = true;
 
-	camera.pos = vec4(0.f);
 	camera.ang = quat();
+	mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, (float)PI / 4.f, 0.f)));
+	mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat((float)PI / 6.f, 0.f, 0.f)));
+	camera.pos = (vec4_t){2.f, -1.f, 2.f, 0.f};
 	camera.fov = 60.f * (float)PI / 180.f;
 	camera_update(&camera);
 }
