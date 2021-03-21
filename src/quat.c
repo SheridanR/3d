@@ -56,22 +56,9 @@ vec4_t quat_to_vec3(const quat_t* q) {
 	t.z *= 2.f;
 	t.w  = 0.f;
 	vec4_t result;
-	add_vec4(
-		&result,
-		add_vec4(
-			&vec4(0.f),
-			&v,
-			pow_vec4(
-				&vec4(0.f),
-				&t,
-				qv.w
-			)
-		),
-		cross_vec3(
-			&vec4(0.f),
-			&qv,
-			&t
-		)
+	add_vec4(&result,
+		add_vec4(&vec4(0.f), &v, pow_vec4(&vec4(0.f), &t, qv.w)),
+		cross_vec3(&vec4(0.f), &qv, &t)
 	);
 	return result;
 }
