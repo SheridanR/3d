@@ -28,16 +28,19 @@ void clear() {
 }
 
 void draw(const camera_t* camera) {
-	vec4_t p[4];
+	vec4_t p[4 * 4 * 4];
 	int count = sizeof(p) / sizeof(p[0]);
 	for (int c = 0; c < count; ++c) {
-		vec4_t* wp = &p[c];
-		*wp = (vec4_t){0.f, 0.f, (float)c, 0.f};
+		p[c] = (vec4_t){(float)(c % 4), (float)((c / 4) % 4), (float)(c / 16), 0.f};
+	}
+
+	for (int c = 0; c < count; ++c) {
 		vec4_t diff;
-		sub_vec4(&diff, wp, &camera->pos);
-		float dot = dot_vec4(&diff, &(vec4_t){0.f, 0.f, -1.f, 0.f});
+		sub_vec4(&diff, &p[c], &camera->pos);
+		vec4_t dir = quat_to_vec3(&camera->ang);
+		float dot = dot_vec4(&diff, &dir);
 		if (dot > 0.f) {
-			vec4_t sp = world_to_screen_coords(wp, camera);
+			vec4_t sp = world_to_screen_coords(&p[c], camera);
 			check_pixel(sp.x, sp.y, color(255, 255, 255, 255));
 		}
 	}

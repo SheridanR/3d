@@ -47,7 +47,7 @@ quat_t* mul_quat(quat_t* result, const quat_t* a, const quat_t* b) {
 }
 
 vec4_t quat_to_vec3(const quat_t* q) {
-	vec4_t v = {1.f, 0.f, 0.f, 0.f};
+	vec4_t v = {0.f, 0.f, -1.f, 0.f};
 	vec4_t qv = {-q->x, -q->y, -q->z, -q->w};
 	vec4_t t;
 	cross_vec3(&t, &qv, &v);

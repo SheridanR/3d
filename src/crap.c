@@ -11,7 +11,7 @@ bool keystatus[SDL_NUM_SCANCODES] = { false };
 void init() {
 	(void)SDL_Init(SDL_INIT_VIDEO);
 	window = SDL_CreateWindow(
-		"Maze",
+		"3d",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		XRES,
