@@ -1,6 +1,7 @@
 #include "draw.h"
 #include "main.h"
 #include "camera.h"
+#include "sim.h"
 #include "crap.h"
 #include <stdint.h>
 #include <string.h>
@@ -27,7 +28,7 @@ void clear() {
 	memset(screen.pixels, color(0, 0, 0, 255), screen.width * screen.height * sizeof(uint32_t));
 }
 
-void draw(const camera_t* camera) {
+void draw() {
 	vec4_t p[4 * 4 * 4];
 	int count = sizeof(p) / sizeof(p[0]);
 	for (int c = 0; c < count; ++c) {
@@ -36,11 +37,11 @@ void draw(const camera_t* camera) {
 
 	for (int c = 0; c < count; ++c) {
 		vec4_t diff;
-		sub_vec4(&diff, &p[c], &camera->pos);
-		vec4_t dir = quat_to_vec3(&camera->ang);
+		sub_vec4(&diff, &p[c], &camera.pos);
+		vec4_t dir = quat_to_vec3(&camera.ang);
 		float dot = dot_vec4(&diff, &dir);
 		if (dot > 0.f) {
-			vec4_t sp = world_to_screen_coords(&p[c], camera);
+			vec4_t sp = world_to_screen_coords(&p[c], &camera);
 			check_pixel(sp.x, sp.y, color(255, 255, 255, 255));
 		}
 	}
