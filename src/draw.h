@@ -6,6 +6,7 @@
 
 typedef struct window {
 	uint32_t* pixels;
+	float* depth;
 	int width;
 	int height;
 } window_t;

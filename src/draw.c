@@ -25,7 +25,8 @@ void check_pixel(uint32_t x, uint32_t y, uint32_t color) {
 }
 
 void clear() {
-	memset(screen.pixels, color(0, 0, 0, 255), screen.width * screen.height * sizeof(uint32_t));
+	memset(screen.depth, 0, screen.width * screen.height * sizeof(float));
+	memset(screen.pixels, 0, screen.width * screen.height * sizeof(uint32_t));
 }
 
 void draw() {

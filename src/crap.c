@@ -22,6 +22,7 @@ void init() {
 	screen.pixels = (uint32_t*)surface->pixels;
 	screen.width = (int)surface->w;
 	screen.height = (int)surface->h;
+	screen.depth = malloc(sizeof(float) * XRES * YRES);
 }
 
 void refresh() {
@@ -52,6 +53,7 @@ void events() {
 }
 
 void term() {
+	free(screen.depth);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
