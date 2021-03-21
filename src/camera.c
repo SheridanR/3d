@@ -48,7 +48,7 @@ void camera_update(camera_t* camera) {
 	camera->proj = perspective(camera->fov, (float)XRES / (float)YRES, (float)CAMERA_CLIP_NEAR);
 
 	quat_t* q = &camera->ang;
-	mat4x4_t rotate = quat_to_mat(&(quat_t){q->z, q->y, -q->x, -q->w});
+	mat4x4_t rotate = quat_to_mat(&(quat_t){q->x, q->y, q->z, -q->w});
 
 	mat4x4_t translate = mat4x4(1.f);
 	pow_vec4(&translate.w, &camera->pos, -1.f);

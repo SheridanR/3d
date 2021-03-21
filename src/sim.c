@@ -25,9 +25,9 @@ void update() {
 		float moveX = (keystatus[SDL_SCANCODE_D] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_A] ? 1.f : 0.f);
 		float moveY = (keystatus[SDL_SCANCODE_Q] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_E] ? 1.f : 0.f);
 		float moveZ = (keystatus[SDL_SCANCODE_W] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_S] ? 1.f : 0.f);
-		float turnX = (keystatus[SDL_SCANCODE_KP_8] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_2] ? 1.f : 0.f);
+		float turnX = (keystatus[SDL_SCANCODE_KP_2] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_8] ? 1.f : 0.f);
 		float turnY = (keystatus[SDL_SCANCODE_KP_4] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_6] ? 1.f : 0.f);
-		float turnZ = (keystatus[SDL_SCANCODE_KP_7] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_9] ? 1.f : 0.f);
+		float turnZ = (keystatus[SDL_SCANCODE_KP_9] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_7] ? 1.f : 0.f);
 
 		vec4_t move = vec4(0.f);
 		vec4_t forward = quat_to_vec3(&camera.ang);
@@ -39,9 +39,9 @@ void update() {
 		add_vec4(&camera.pos, &vec4_copy(camera.pos), &move);
 
 		float fps = 60.f;
-		mul_quat(&camera.ang, &quat_copy(euler_to_quat(turnX * (float)PI / fps, 0.f, 0.f)), &quat_copy(camera.ang));
-		mul_quat(&camera.ang, &quat_copy(euler_to_quat(0.f, turnY * (float)PI / fps, 0.f)), &quat_copy(camera.ang));
-		mul_quat(&camera.ang, &quat_copy(euler_to_quat(0.f, 0.f, turnZ * (float)PI / fps)), &quat_copy(camera.ang));
+		mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(turnX * (float)PI / fps, 0.f, 0.f)));
+		mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, turnY * (float)PI / fps, 0.f)));
+		mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, 0.f, turnZ * (float)PI / fps)));
 
 		camera_update(&camera);
 	}
