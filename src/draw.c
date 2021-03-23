@@ -2,8 +2,6 @@
 #include "main.h"
 #include "camera.h"
 #include "sim.h"
-#include "crap.h"
-#include "triangle.h"
 #include <string.h>
 
 window_t screen;
@@ -30,38 +28,5 @@ void clear() {
 }
 
 void draw() {
-	vec4_t camera_dir = quat_to_vec3(&camera.ang);
-	vec4_t* p = cube;
-	int count = sizeof(cube) / sizeof(vec4_t);
-	for (int c = 0; c < count; c += 3) {
-		vec4_t normal = vec4(0.f);
-		cross_vec3(&normal, sub_vec4(&vec4(0.f), &p[c + 1], &p[c]), sub_vec4(&vec4(0.f), &p[c + 2], &p[c]));
-		normal_vec4(&normal, &vec4_copy(normal));
-		for (int i = 0; i < 3; ++i) {
-			vec4_t diff;
-			sub_vec4(&diff, &p[c + i], &camera.pos);
-			normal_vec4(&diff, &vec4_copy(diff));
-			if (dot_vec4(&diff, &camera_dir) <= 0.f) {
-				goto next; // cull objects that would be projected backwards
-			}
-			if (dot_vec4(&diff, &normal) < 0.f) {
-				goto next; // backface culling
-			}
-		}
-		vec4_t sp[3];
-		sp[0] = world_to_screen_coords(&p[c], &camera);
-		sp[1] = world_to_screen_coords(&p[c + 1], &camera);
-		sp[2] = world_to_screen_coords(&p[c + 2], &camera);
-		point_t t[3];
-		t[0] = (point_t){sp[0].x, sp[0].y};
-		t[1] = (point_t){sp[1].x, sp[1].y};
-		t[2] = (point_t){sp[2].x, sp[2].y};
-		uint8_t r, g, b;
-		r = (p[c].x + p[c + 1].x + p[c + 2].x) * 255.f / 3.f;
-		g = (p[c].y + p[c + 1].y + p[c + 2].y) * 255.f / 3.f;
-		b = (p[c].z + p[c + 1].z + p[c + 2].z) * 255.f / 3.f;
-		draw_triangle(t[0], t[1], t[2], color(r, g, b, 255));
-next:
-		continue;
-	}
+	draw_obj(&obj, &camera);
 }

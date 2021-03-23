@@ -2,62 +2,15 @@
 #define SIM_H
 
 #include "camera.h"
+#include "obj.h"
 #include <stdbool.h>
 
 extern bool running;
 extern camera_t camera;
+extern obj_t obj;
 
-void setup();
+void setup(const char* filename);
 void update();
-
-static vec4_t cube[] = {
-	{0.f, 0.f, 0.f, 0.f},
-	{1.f, 0.f, 0.f, 0.f},
-	{1.f, 1.f, 0.f, 0.f},
-
-	{0.f, 0.f, 0.f, 0.f},
-	{1.f, 1.f, 0.f, 0.f},
-	{0.f, 1.f, 0.f, 0.f},
-
-	{0.f, 0.f, 1.f, 0.f},
-	{0.f, 1.f, 1.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-
-	{0.f, 0.f, 1.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-	{1.f, 0.f, 1.f, 0.f},
-
-	{0.f, 0.f, 0.f, 0.f},
-	{1.f, 0.f, 1.f, 0.f},
-	{1.f, 0.f, 0.f, 0.f},
-
-	{0.f, 0.f, 0.f, 0.f},
-	{0.f, 0.f, 1.f, 0.f},
-	{1.f, 0.f, 1.f, 0.f},
-
-	{0.f, 1.f, 0.f, 0.f},
-	{1.f, 1.f, 0.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-
-	{0.f, 1.f, 0.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-	{0.f, 1.f, 1.f, 0.f},
-
-	{0.f, 0.f, 0.f, 0.f},
-	{0.f, 1.f, 0.f, 0.f},
-	{0.f, 1.f, 1.f, 0.f},
-
-	{0.f, 0.f, 0.f, 0.f},
-	{0.f, 1.f, 1.f, 0.f},
-	{0.f, 0.f, 1.f, 0.f},
-
-	{1.f, 0.f, 0.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-	{1.f, 1.f, 0.f, 0.f},
-
-	{1.f, 0.f, 0.f, 0.f},
-	{1.f, 0.f, 1.f, 0.f},
-	{1.f, 1.f, 1.f, 0.f},
-};
+void close();
 
 #endif

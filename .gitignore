@@ -1,6 +1,6 @@
 *.exe
 *.dll
-*.obj
+/*.obj
 *.lib
 *.so
 *.o

@@ -4,6 +4,7 @@ src/crap.c ^
 src/draw.c ^
 src/main.c ^
 src/matrix.c ^
+src/obj.c ^
 src/quat.c ^
 src/sim.c ^
 src/timer.c ^

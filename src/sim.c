@@ -5,12 +5,18 @@
 #include "crap.h"
 #include "quat.h"
 #include "vec4.h"
+#include "obj.h"
 
 bool running;
 camera_t camera;
+obj_t obj;
 
-void setup() {
+void setup(const char* filename) {
 	running = true;
+
+	obj.positions = NULL;
+	obj.indices = NULL;
+	load_obj(&obj, filename);
 
 	camera.ang = quat();
 	mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, (float)PI / 4.f, 0.f)));
@@ -50,5 +56,11 @@ void update() {
 		mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, 0.f, turnSpeed * turnZ)));
 
 		camera_update(&camera);
+	}
+}
+
+void close() {
+	if (obj.positions && obj.indices) {
+		free_obj(&obj);
 	}
 }
