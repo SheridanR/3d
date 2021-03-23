@@ -40,5 +40,7 @@ void clear() {
 }
 
 void draw() {
-	draw_obj(&obj, &camera);
+	if (obj.positions && obj.indices) {
+		draw_obj(&obj, &camera);
+	}
 }

@@ -16,7 +16,7 @@ void setup(const char* filename) {
 
 	obj.positions = NULL;
 	obj.indices = NULL;
-	load_obj(&obj, filename);
+	(void)load_obj(&obj, filename);
 
 	camera.ang = quat();
 	mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, (float)PI / 4.f, 0.f)));
