@@ -18,5 +18,7 @@ extern inline vec4_t* pow_vec4(vec4_t* result, const vec4_t* v, float f);
 extern inline vec4_t* cross_vec3(vec4_t* result, const vec4_t* a, const vec4_t* b);
 extern inline vec4_t* cross_vec4(vec4_t* result, const vec4_t* a, const vec4_t* b);
 extern inline float dot_vec4(const vec4_t* a, const vec4_t* b);
+extern inline float length_vec4(const vec4_t* v);
+extern inline vec4_t* normal_vec4(vec4_t* result, const vec4_t* v);
 
 #endif

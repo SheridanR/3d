@@ -30,16 +30,22 @@ void clear() {
 }
 
 void draw() {
+	vec4_t camera_dir = quat_to_vec3(&camera.ang);
 	vec4_t* p = cube;
 	int count = sizeof(cube) / sizeof(vec4_t);
 	for (int c = 0; c < count; c += 3) {
+		vec4_t normal = vec4(0.f);
+		cross_vec3(&normal, sub_vec4(&vec4(0.f), &p[c + 1], &p[c]), sub_vec4(&vec4(0.f), &p[c + 2], &p[c]));
+		normal_vec4(&normal, &vec4_copy(normal));
 		for (int i = 0; i < 3; ++i) {
 			vec4_t diff;
 			sub_vec4(&diff, &p[c + i], &camera.pos);
-			vec4_t dir = quat_to_vec3(&camera.ang);
-			float dot = dot_vec4(&diff, &dir);
-			if (dot <= 0.f) {
-				goto next;
+			normal_vec4(&diff, &vec4_copy(diff));
+			if (dot_vec4(&diff, &camera_dir) <= 0.f) {
+				goto next; // cull objects that would be projected backwards
+			}
+			if (dot_vec4(&diff, &normal) < 0.f) {
+				goto next; // backface culling
 			}
 		}
 		vec4_t sp[3];
@@ -55,9 +61,6 @@ void draw() {
 		g = (p[c].y + p[c + 1].y + p[c + 2].y) * 255.f / 3.f;
 		b = (p[c].z + p[c + 1].z + p[c + 2].z) * 255.f / 3.f;
 		draw_triangle(t[0], t[1], t[2], color(r, g, b, 255));
-		//check_pixel(sp[0].x, sp[0].y, color(255, 255, 255, 255));
-		//check_pixel(sp[1].x, sp[1].y, color(255, 255, 255, 255));
-		//check_pixel(sp[2].x, sp[2].y, color(255, 255, 255, 255));
 next:
 		continue;
 	}

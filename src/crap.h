@@ -10,5 +10,7 @@ void refresh();
 void term();
 
 extern bool keystatus[SDL_NUM_SCANCODES];
+extern inline int mind(int a, int b);
+extern inline int maxd(int a, int b);
 
 #endif

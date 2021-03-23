@@ -8,6 +8,14 @@ static SDL_Window* window;
 static SDL_Surface* surface;
 bool keystatus[SDL_NUM_SCANCODES] = { false };
 
+int mind(int a, int b) {
+	return a < b ? a : b;
+}
+
+int maxd(int a, int b) {
+	return a > b ? a : b;
+}
+
 void init() {
 	(void)SDL_Init(SDL_INIT_VIDEO);
 	window = SDL_CreateWindow(

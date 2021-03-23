@@ -1,6 +1,7 @@
 #include "main.h"
 #include "triangle.h"
 #include "draw.h"
+#include "crap.h"
 #include <stdlib.h>
 
 static inline void triangle_top(point_t p[3], uint32_t color) {
@@ -8,22 +9,29 @@ static inline void triangle_top(point_t p[3], uint32_t color) {
 	float x1 = p[0].x;
 	float inv_slope0 = (p[1].x - p[0].x) / (p[1].y - p[0].y);
 	float inv_slope1 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
-	int starty = (int)p[0].y < 0 ? 0 : ((int)p[0].y >= YRES ? YRES - 1 : (int)p[0].y);
-	int endy = (int)p[1].y < 0 ? 0 : ((int)p[1].y >= YRES ? YRES - 1 : (int)p[1].y);
+	int starty = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
+	int endy = (int)p[1].y <= 0 ? -1 : ((int)p[1].y >= YRES ? YRES - 1 : (int)p[1].y);
+	if (starty == YRES || endy == -1) {
+		return;
+	}
 	x0 += inv_slope0 * abs(starty - (int)p[0].y);
 	x1 += inv_slope1 * abs(starty - (int)p[0].y);
-	for (int y = starty; y <= endy; ++y) {
+	for (int y = starty; y < endy; ++y) {
 		if (y >= 0 && y < YRES) {
 			int startx, endx;
 			if (x0 < x1) {
-				startx = (int)x0 < 0 ? 0 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
-				endx = (int)x1 < 0 ? 0 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
+				startx = (int)x0 < 0 ? 0 : ((int)x0 > XRES ? XRES : (int)x0);
+				endx = (int)x1 <= 0 ? -1 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
 			} else {
-				startx = (int)x1 < 0 ? 0 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
-				endx = (int)x0 < 0 ? 0 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
+				startx = (int)x1 < 0 ? 0 : ((int)x1 > XRES ? XRES : (int)x1);
+				endx = (int)x0 <= 0 ? -1 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
 			}
-			for (int x = startx; x <= endx; ++x) {
-				pixel(x, y, color);
+			startx = maxd(startx, mind(p[0].x, mind(p[1].x, p[2].x)));
+			endx = mind(endx, maxd(p[0].x, maxd(p[1].x, p[2].x)));
+			if (startx < XRES && endx >= 0) {
+				for (int x = startx; x <= endx; ++x) {
+					pixel(x, y, color);
+				}
 			}
 		}
 		x0 += inv_slope0;
@@ -36,22 +44,29 @@ static inline void triangle_bottom(point_t p[3], uint32_t color) {
 	float x1 = p[2].x;
 	float inv_slope0 = (p[2].x - p[0].x) / (p[2].y - p[0].y);
 	float inv_slope1 = (p[2].x - p[1].x) / (p[2].y - p[1].y);
-	int starty = (int)p[2].y < 0 ? 0 : ((int)p[2].y >= YRES ? YRES - 1 : (int)p[2].y);
-	int endy = (int)p[0].y < 0 ? 0 : ((int)p[0].y >= YRES ? YRES - 1 : (int)p[0].y);
-	x0 -= inv_slope0 * abs(starty - (int)p[2].y);
-	x1 -= inv_slope1 * abs(starty - (int)p[2].y);
-	for (int y = starty; y > endy; --y) {
+	int starty = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
+	int endy = (int)p[2].y <= 0 ? -1 : ((int)p[2].y >= YRES ? YRES - 1 : (int)p[2].y);
+	if (starty == YRES || endy == -1) {
+		return;
+	}
+	x0 -= inv_slope0 * abs(endy - (int)p[2].y);
+	x1 -= inv_slope1 * abs(endy - (int)p[2].y);
+	for (int y = endy; y >= starty; --y) {
 		if (y >= 0 && y < YRES) {
 			int startx, endx;
 			if (x0 < x1) {
-				startx = (int)x0 < 0 ? 0 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
-				endx = (int)x1 < 0 ? 0 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
+				startx = (int)x0 < 0 ? 0 : ((int)x0 > XRES ? XRES : (int)x0);
+				endx = (int)x1 <= 0 ? -1 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
 			} else {
-				startx = (int)x1 < 0 ? 0 : ((int)x1 >= XRES ? XRES - 1 : (int)x1);
-				endx = (int)x0 < 0 ? 0 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
+				startx = (int)x1 < 0 ? 0 : ((int)x1 > XRES ? XRES : (int)x1);
+				endx = (int)x0 <= 0 ? -1 : ((int)x0 >= XRES ? XRES - 1 : (int)x0);
 			}
-			for (int x = startx; x <= endx; ++x) {
-				pixel(x, y, color);
+			startx = maxd(startx, mind(p[0].x, mind(p[1].x, p[2].x)));
+			endx = mind(endx, maxd(p[0].x, maxd(p[1].x, p[2].x)));
+			if (startx < XRES && endx >= 0) {
+				for (int x = startx; x <= endx; ++x) {
+					pixel(x, y, color);
+				}
 			}
 		}
 		x0 -= inv_slope0;
