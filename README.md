@@ -1,9 +1,11 @@
 # 3d
 a simple 3d software renderer in < 1000 lines of C.
 
+![picture of a cube](https://raw.githubusercontent.com/SheridanR/3d/master/screenshot.png)
+
 ## compiling
 you need SDL2 to build the project. (https://www.libsdl.org/download-2.0.php)
-if you want to, you can port to a different window / input library.
+if you want to, you can also port to a different window/input library.
 all of the SDL2-specific code is in crap.c / crap.h.
 check build.bat for an extremely basic build script on windows.
 
