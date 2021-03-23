@@ -16,7 +16,7 @@ static inline void triangle_top(point_t p[3], uint32_t color) {
 	}
 	x0 += inv_slope0 * abs(starty - (int)p[0].y);
 	x1 += inv_slope1 * abs(starty - (int)p[0].y);
-	for (int y = starty; y < endy; ++y) {
+	for (int y = starty; y <= endy; ++y) {
 		if (y >= 0 && y < YRES) {
 			int startx, endx;
 			if (x0 < x1) {
