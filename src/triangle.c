@@ -30,7 +30,10 @@ static inline void triangle_top(point_t p[3], uint32_t color) {
 			endx = mind(endx, maxd(p[0].x, maxd(p[1].x, p[2].x)));
 			if (startx < XRES && endx >= 0) {
 				for (int x = startx; x <= endx; ++x) {
-					pixel(x, y, color);
+					if (check_depth(x, y, p[0].z)) {
+						pixel(x, y, color);
+						write_depth(x, y, p[0].z);
+					}
 				}
 			}
 		}
@@ -65,7 +68,10 @@ static inline void triangle_bottom(point_t p[3], uint32_t color) {
 			endx = mind(endx, maxd(p[0].x, maxd(p[1].x, p[2].x)));
 			if (startx < XRES && endx >= 0) {
 				for (int x = startx; x <= endx; ++x) {
-					pixel(x, y, color);
+					if (check_depth(x, y, p[0].z)) {
+						pixel(x, y, color);
+						write_depth(x, y, p[0].z);
+					}
 				}
 			}
 		}

@@ -80,8 +80,8 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
 		sp[2] = world_to_screen_coords(p[2], camera);
 		point_t t[3];
 		t[0] = (point_t){sp[0].x, sp[0].y, sp[0].z};
-		t[1] = (point_t){sp[1].x, sp[1].y, sp[0].z};
-		t[2] = (point_t){sp[2].x, sp[2].y, sp[0].z};
+		t[1] = (point_t){sp[1].x, sp[1].y, sp[1].z};
+		t[2] = (point_t){sp[2].x, sp[2].y, sp[2].z};
 		uint8_t r, g, b;
 		r = (p[0]->x + p[1]->x + p[2]->x) * 255.f / 3.f;
 		g = (p[0]->y + p[1]->y + p[2]->y) * 255.f / 3.f;

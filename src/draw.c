@@ -3,6 +3,8 @@
 #include "camera.h"
 #include "sim.h"
 #include <string.h>
+#include <stdbool.h>
+#include <float.h>
 
 window_t screen;
 
@@ -22,9 +24,19 @@ void check_pixel(uint32_t x, uint32_t y, uint32_t color) {
 	}
 }
 
+bool check_depth(uint32_t x, uint32_t y, float depth) {
+	return screen.depth[y * screen.width + x] > depth;
+}
+
+void write_depth(uint32_t x, uint32_t y, float depth) {
+	screen.depth[y * screen.width + x] = depth;
+}
+
 void clear() {
-	memset(screen.depth, 0, screen.width * screen.height * sizeof(float));
-	memset(screen.pixels, 0, screen.width * screen.height * sizeof(uint32_t));
+	for (size_t c = 0; c < XRES * YRES; ++c) {
+		screen.pixels[c] = 0;
+		screen.depth[c] = FLT_MAX;
+	}
 }
 
 void draw() {
