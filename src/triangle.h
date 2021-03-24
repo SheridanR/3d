@@ -7,8 +7,11 @@ typedef struct point {
 	float x;
 	float y;
 	float z;
+	float r;
+	float g;
+	float b;
 } point_t;
 
-void draw_triangle(point_t p0, point_t p1, point_t p2, uint32_t color);
+void draw_triangle(point_t p0, point_t p1, point_t p2);
 
 #endif

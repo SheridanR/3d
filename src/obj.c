@@ -63,30 +63,31 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
 		vec4_t normal = vec4(0.f);
 		cross_vec3(&normal, sub_vec4(&vec4(0.f), p[1], p[0]), sub_vec4(&vec4(0.f), p[2], p[0]));
 		normal_vec4(&normal, &vec4_copy(normal));
+		float r[3], g[3], b[3];
 		for (int i = 0; i < 3; ++i) {
-			vec4_t diff;
+			vec4_t diff = vec4(0.f);
 			sub_vec4(&diff, p[i], &camera->pos);
 			normal_vec4(&diff, &vec4_copy(diff));
 			if (dot_vec4(&diff, &camera_dir) <= 0.f) {
 				goto next; // cull triangles that would be projected backwards
 			}
-			if (dot_vec4(&diff, &normal) > 0.f) {
+			const float dir = dot_vec4(&diff, &normal);
+			if (dir > 0.f) {
 				goto next; // backface culling
 			}
+			r[i] = -dir;
+			g[i] = -dir;
+			b[i] = -dir;
 		}
 		vec4_t sp[3];
 		sp[0] = world_to_screen_coords(p[0], camera);
 		sp[1] = world_to_screen_coords(p[1], camera);
 		sp[2] = world_to_screen_coords(p[2], camera);
 		point_t t[3];
-		t[0] = (point_t){sp[0].x, sp[0].y, sp[0].z};
-		t[1] = (point_t){sp[1].x, sp[1].y, sp[1].z};
-		t[2] = (point_t){sp[2].x, sp[2].y, sp[2].z};
-		uint8_t r, g, b;
-		r = (p[0]->x + p[1]->x + p[2]->x) * 255.f / 3.f;
-		g = (p[0]->y + p[1]->y + p[2]->y) * 255.f / 3.f;
-		b = (p[0]->z + p[1]->z + p[2]->z) * 255.f / 3.f;
-		draw_triangle(t[0], t[1], t[2], color(r, g, b, 255));
+		t[0] = (point_t){sp[0].x, sp[0].y, sp[0].z, r[0], g[0], b[0]};
+		t[1] = (point_t){sp[1].x, sp[1].y, sp[1].z, r[1], g[1], b[1]};
+		t[2] = (point_t){sp[2].x, sp[2].y, sp[2].z, r[2], g[2], b[2]};
+		draw_triangle(t[0], t[1], t[2]);
 next:
 		continue;
 	}
