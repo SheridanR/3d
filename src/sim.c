@@ -14,8 +14,6 @@ obj_t obj;
 void setup(const char* filename) {
 	running = true;
 
-	obj.positions = NULL;
-	obj.indices = NULL;
 	(void)load_obj(&obj, filename);
 
 	camera.ang = quat();
@@ -60,7 +58,7 @@ void update() {
 }
 
 void close() {
-	if (obj.positions && obj.indices) {
+	if (obj.valid) {
 		free_obj(&obj);
 	}
 }
