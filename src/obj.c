@@ -25,9 +25,15 @@ obj_t* load_obj(obj_t* result, const char* filename) {
 				++result->num_normals;
 			}
 			else if (strcmp(type, "f") == 0) {
-				result->num_position_indices += 3;
-				result->num_texture_coord_indices += 3;
-				result->num_normal_indices += 3;
+                char *token;
+                while ((token = strtok(NULL, " "))) {
+                    result->num_position_indices += 3;
+                    result->num_texture_coord_indices += 3;
+                    result->num_normal_indices += 3;
+                }
+                result->num_position_indices -= 6;
+                result->num_texture_coord_indices -= 6;
+                result->num_normal_indices -= 6;
 			}
 		}
 	}
@@ -62,17 +68,35 @@ obj_t* load_obj(obj_t* result, const char* filename) {
 				result->normals[normal_count++] = (vec4_t){f1, f2, f3, 0.f};
 			}
 			else if (strcmp(type, "f") == 0) {
+                int index = 0;
 				char *token, *token2, *token3;
+                uint32_t first_position_index = position_indices_count;
+                uint32_t first_texture_coord_index = texture_coord_indices_count;
+                uint32_t first_normal_index = normal_indices_count;
+                uint32_t last_position_index;
+                uint32_t last_texture_coord_index;
+                uint32_t last_normal_index;
 				while ((token = strtok(NULL, " "))) {
+                    if (++index > 3) {
+                        result->position_indices[position_indices_count++] = result->position_indices[first_position_index];
+                        result->position_indices[position_indices_count++] = result->position_indices[last_position_index];
+                        result->texture_coord_indices[texture_coord_indices_count++] = result->texture_coord_indices[first_texture_coord_index];
+                        result->texture_coord_indices[texture_coord_indices_count++] = result->texture_coord_indices[last_texture_coord_index];
+                        result->normal_indices[normal_indices_count++] = result->normal_indices[first_normal_index];
+                        result->normal_indices[normal_indices_count++] = result->normal_indices[last_normal_index];
+                    }
 					uint32_t position_index = (uint32_t)strtol(token, NULL, 10) - 1;
+                    last_position_index = position_indices_count;
 					result->position_indices[position_indices_count++] = position_index;
 					if ((token2 = strchr(token, '/'))) {
 						++token2;
 						uint32_t texture_coord_index = (uint32_t)strtol(token2, NULL, 10) - 1;
+                        last_texture_coord_index = texture_coord_indices_count;
 						result->texture_coord_indices[texture_coord_indices_count++] = texture_coord_index;
 						if ((token3 = strchr(token2, '/'))) {
 							++token3;
 							uint32_t normal_index = (uint32_t)strtol(token3, NULL, 10) - 1;
+                            last_normal_index = normal_indices_count;
 							result->normal_indices[normal_indices_count++] = normal_index;
 						}
 					}
