@@ -63,14 +63,14 @@ obj_t* load_obj(obj_t* result, const char* filename) {
 			}
 			else if (strcmp(type, "f") == 0) {
 				char *token, *token2, *token3;
-				while (token = strtok(NULL, " ")) {
+				while ((token = strtok(NULL, " "))) {
 					uint32_t position_index = (uint32_t)strtol(token, NULL, 10) - 1;
 					result->position_indices[position_indices_count++] = position_index;
-					if (token2 = strchr(token, '/')) {
+					if ((token2 = strchr(token, '/'))) {
 						++token2;
 						uint32_t texture_coord_index = (uint32_t)strtol(token2, NULL, 10) - 1;
 						result->texture_coord_indices[texture_coord_indices_count++] = texture_coord_index;
-						if (token3 = strchr(token2, '/')) {
+						if ((token3 = strchr(token2, '/'))) {
 							++token3;
 							uint32_t normal_index = (uint32_t)strtol(token3, NULL, 10) - 1;
 							result->normal_indices[normal_indices_count++] = normal_index;

@@ -2,7 +2,7 @@
 #include "main.h"
 #include "sim.h"
 #include "draw.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 static SDL_Window* window;
 static SDL_Surface* surface;

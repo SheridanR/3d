@@ -5,3 +5,5 @@
 *.so
 *.o
 external/*
+*.arm64
+.DS_Store

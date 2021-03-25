@@ -5,6 +5,7 @@
 #include "camera.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 typedef struct obj {
 	bool valid;
