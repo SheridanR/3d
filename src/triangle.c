@@ -118,20 +118,10 @@ static inline void triangle_half(
 	}
 }
 
-static inline void sort_points(point_t p[3]) {
-	int n = 3;
-	do {
-		int new_n = 0;
-		for (int i = 1; i < n; ++i) {
-			if (p[i - 1].y > p[i].y) {
-				point_t t = p[i];
-				p[i] = p[i - 1];
-				p[i - 1] = t;
-				new_n = i;
-			}
-		}
-		n = new_n;
-	} while (n > 1);
+static inline void swap(point_t* p0, point_t* p1) {
+	point_t t = *p0;
+	*p0 = *p1;
+	*p1 = t;
 }
 
 #define TRIANGLE_TOP(P) triangle_half(P, 1, 1, (int[4]){1, 0, 2, 0}, 0)
@@ -139,7 +129,9 @@ static inline void sort_points(point_t p[3]) {
 
 void draw_triangle(point_t p0, point_t p1, point_t p2) {
 	point_t p[3] = {p0, p1, p2};
-	sort_points(p);
+	if (p[0].y > p[1].y) { swap(&p[0], &p[1]); }
+	if (p[1].y > p[2].y) { swap(&p[1], &p[2]); }
+	if (p[0].y > p[1].y) { swap(&p[0], &p[1]); }
 	if (p[1].y == p[2].y) {
 		TRIANGLE_TOP(p);
 	} else if (p[0].y == p[1].y) {
