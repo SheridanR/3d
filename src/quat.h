@@ -4,10 +4,10 @@
 #include "matrix.h"
 
 typedef struct quat {
-	float x;
-	float y;
-	float z;
-	float w;
+    float x;
+    float y;
+    float z;
+    float w;
 } quat_t;
 
 #define quat() ((quat_t){0.f, 0.f, 0.f, 1.f})

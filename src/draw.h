@@ -6,10 +6,10 @@
 #include <stdbool.h>
 
 typedef struct window {
-	uint32_t* pixels;
-	float* depth;
-	int width;
-	int height;
+    uint32_t* pixels;
+    float* depth;
+    int width;
+    int height;
 } window_t;
 
 extern window_t screen;
