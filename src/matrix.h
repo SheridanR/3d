@@ -4,10 +4,7 @@
 #include "vec4.h"
 
 typedef struct mat4x4 {
-    vec4_t x;
-    vec4_t y;
-    vec4_t z;
-    vec4_t w;
+    vec4_t x; vec4_t y; vec4_t z; vec4_t w;
 } mat4x4_t;
 
 #define mat4x4(F) ((mat4x4_t) {\

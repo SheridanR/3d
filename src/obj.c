@@ -39,10 +39,7 @@ obj_t* load_obj(obj_t* result, const char* filename) {
             }
             else if (strcmp(type, "mtllib") == 0) {
                 char buf[128] = {'\0'};
-                char* prefix = strrchr(filename, '/');
-                if (!prefix) {
-                    prefix = strrchr(filename, '\\');
-                }
+                char* prefix = strrchr(filename, '/') ? strrchr(filename, '/') : strrchr(filename, '\\');
                 strncpy(buf, filename, (size_t)(prefix - filename + 1));
                 char* name = strtok(NULL, " \r\n");
                 strcat(buf, name);
@@ -51,10 +48,7 @@ obj_t* load_obj(obj_t* result, const char* filename) {
             else if (strcmp(type, "usemtl") == 0) {
                 char buf[128] = {'\0'};
                 char* name = type + strlen(type) + 1;
-                char* newline = strrchr(name, '\r');
-                if (!newline) {
-                    newline = strrchr(name, '\n');
-                }
+                char* newline = strrchr(name, '\r') ? strrchr(name, '\r') : strrchr(name, '\n');
                 strncpy(buf, name, (size_t)(newline - name));
                 for (int c = 0; c < MATERIAL_LIMIT; ++c) {
                     mtl_t* mtl = &result->mtllib.materials[c];
@@ -186,10 +180,10 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
         sp[1] = world_to_screen_coords(p[1], camera);
         sp[2] = world_to_screen_coords(p[2], camera);
         point_t triangle[3];
-        triangle[0] = (point_t){sp[0].x, sp[0].y, sp[0].z, r[0], g[0], b[0]};
-        triangle[1] = (point_t){sp[1].x, sp[1].y, sp[1].z, r[1], g[1], b[1]};
-        triangle[2] = (point_t){sp[2].x, sp[2].y, sp[2].z, r[2], g[2], b[2]};
-        draw_triangle(triangle[0], triangle[1], triangle[2]);
+        triangle[0] = (point_t){sp[0].x, sp[0].y, sp[0].z, r[0], g[0], b[0], t[0]->x, t[0]->y};
+        triangle[1] = (point_t){sp[1].x, sp[1].y, sp[1].z, r[1], g[1], b[1], t[1]->x, t[1]->y};
+        triangle[2] = (point_t){sp[2].x, sp[2].y, sp[2].z, r[2], g[2], b[2], t[2]->x, t[2]->y};
+        draw_triangle(triangle[0], triangle[1], triangle[2], mtl);
 next:
         continue;
     }

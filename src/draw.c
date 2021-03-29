@@ -34,8 +34,7 @@ void write_depth(uint32_t x, uint32_t y, float depth) {
 
 void clear() {
     for (size_t c = 0; c < XRES * YRES; ++c) {
-        screen.pixels[c] = 0;
-        screen.depth[c] = FLT_MAX;
+        screen.pixels[c] = 0; screen.depth[c] = FLT_MAX;
     }
 }
 

@@ -46,10 +46,7 @@ vec4_t quat_to_vec3(const quat_t* q) {
     vec4_t qv = {-q->x, -q->y, -q->z, -q->w};
     vec4_t t;
     cross_vec3(&t, &qv, &v);
-    t.x *= 2.f;
-    t.y *= 2.f;
-    t.z *= 2.f;
-    t.w  = 0.f;
+    t.x *= 2.f; t.y *= 2.f; t.z *= 2.f; t.w = 0.f;
     vec4_t result;
     add_vec4(&result,
         add_vec4(&vec4(0.f), &v, pow_vec4(&vec4(0.f), &t, qv.w)),

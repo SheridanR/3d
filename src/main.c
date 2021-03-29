@@ -10,7 +10,6 @@ int main(int argc, char* argv[]) {
     } else {
         file = "mesh/cube.obj";
     }
-
     init();             // create window
     setup(file);        // create world sim
     while (running) {

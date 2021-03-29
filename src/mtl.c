@@ -49,10 +49,7 @@ mtllib_t* load_mtllib(mtllib_t* result, const char* filename) {
                 mtl = &result->materials[new_mtl_index++];
                 char buf[128] = {'\0'};
                 char* name = type + strlen(type) + 1;
-                char* newline = strrchr(name, '\r');
-                if (!newline) {
-                    newline = strrchr(name, '\n');
-                }
+                char* newline = strrchr(name, '\r') ? strrchr(name, '\r') : strrchr(name, '\n');
                 strncpy(buf, name, newline - name);
                 strcpy(mtl->filename, buf);
             }
@@ -64,11 +61,8 @@ mtllib_t* load_mtllib(mtllib_t* result, const char* filename) {
             }
             else if (strcmp(type, "map_Kd") == 0) {
                 char buf[128] = {'\0'};
-                char* prefix = strrchr(filename, '/');
-                if (!prefix) {
-                    prefix = strrchr(filename, '\\');
-                }
-                strncpy(buf, prefix, (size_t)(prefix - filename + 1));
+                char* prefix = strrchr(filename, '/') ? strrchr(filename, '/') : strrchr(filename, '\\');
+                strncpy(buf, filename, (size_t)(prefix - filename + 1));
                 char* name = strtok(NULL, " \r\n");
                 strcat(buf, name);
                 (void)load_texture(&mtl->diffuse_texture, buf);

@@ -29,5 +29,4 @@ typedef struct mtllib {
 mtllib_t* load_mtllib(mtllib_t* result, const char* filename);
 void free_mtllib(mtllib_t* mtllib);
 
-
 #endif
