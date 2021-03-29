@@ -3,13 +3,19 @@
 #include "sim.h"
 #include "draw.h"
 #include <SDL2/SDL.h>
+#ifdef TEXTURES
+#include <SDL2/SDL_image.h>
+#endif
 
 static SDL_Window* window;
 static SDL_Surface* surface;
 bool keystatus[SDL_NUM_SCANCODES] = { false };
 
 void init() {
-    (void)SDL_Init(SDL_INIT_VIDEO);
+    (void)SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+#ifdef TEXTURES
+    (void)IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF);
+#endif
     window = SDL_CreateWindow(
         "3d",
         SDL_WINDOWPOS_UNDEFINED,
@@ -53,6 +59,9 @@ void events() {
 }
 
 void term() {
+#ifdef TEXTURES
+    IMG_Quit();
+#endif
     free(screen.depth);
     SDL_DestroyWindow(window);
     SDL_Quit();

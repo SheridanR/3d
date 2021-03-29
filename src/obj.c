@@ -36,6 +36,29 @@ obj_t* load_obj(obj_t* result, const char* filename) {
                     result->num_indices[c] -= 6;
                 }
             }
+            else if (strcmp(type, "mtllib") == 0) {
+                char buf[128] = {'\0'};
+                char* prefix = strrchr(filename, '/');
+                strncpy(buf, filename, (size_t)(prefix - filename + 1));
+                char* name = strtok(NULL, " \r\n");
+                strcat(buf, name);
+                (void)load_mtllib(&result->mtllib, buf);
+            }
+            else if (strcmp(type, "usemtl") == 0) {
+                char buf[128] = {'\0'};
+                char* name = type + strlen(type) + 1;
+                char* newline = strrchr(name, '\r');
+                if (!newline) {
+                    newline = strrchr(name, '\n');
+                }
+                strncpy(buf, name, (size_t)(newline - name));
+                for (int c = 0; c < MATERIAL_LIMIT; ++c) {
+                    mtl_t* mtl = &result->mtllib.materials[c];
+                    if (strcmp(mtl->filename, buf) == 0) {
+                        result->mtl = mtl;
+                    }
+                }
+            }
         }
     }
     rewind(fp);
@@ -43,7 +66,7 @@ obj_t* load_obj(obj_t* result, const char* filename) {
         result->coords[c] = (vec4_t*)malloc(result->num_coords[c] * sizeof(vec4_t));
         result->indices[c] = (uint32_t*)malloc(result->num_indices[c] * sizeof(uint32_t));
     }
-    size_t indices_count[VB_NUM] = {0}, coords_count[VB_NUM] = {0};
+    uint32_t indices_count[VB_NUM] = {0}, coords_count[VB_NUM] = {0};
     while (fgets(buf, sizeof(buf), fp)) {
         if (buf[0] != '#' && buf[0] != '\n') {
             char* type = strtok(buf, " ");
@@ -66,12 +89,12 @@ obj_t* load_obj(obj_t* result, const char* filename) {
             }
             else if (strcmp(type, "f") == 0) {
                 int index = 0;
-                char *token, *token2, *token3;
                 uint32_t first_index[VB_NUM];
                 uint32_t last_index[VB_NUM];
                 for (int c = 0; c < VB_NUM; ++c) {
                     first_index[c] = indices_count[c];
                 }
+                char *token;
                 while ((token = strtok(NULL, " "))) {
                     if (++index > 3) {
                         for (int c = 0; c < VB_NUM; ++c) {
@@ -100,9 +123,12 @@ obj_t* load_obj(obj_t* result, const char* filename) {
 }
 
 void free_obj(obj_t* obj) {
-    for (int c = 0; c < VB_NUM; ++c) {
-        free(obj->coords[c]);
-        free(obj->indices[c]);
+    if (obj->valid) {
+        free_mtllib(&obj->mtllib);
+        for (int c = 0; c < VB_NUM; ++c) {
+            free(obj->coords[c]);
+            free(obj->indices[c]);
+        }
     }
 }
 
@@ -139,9 +165,9 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
                 goto next; // backface culling
             }
             const float dir = dot_vec4(&diff, n[i]);
-            r[i] = fmin(fmax(0.f, -dir), 1.f);
-            g[i] = fmin(fmax(0.f, -dir), 1.f);
-            b[i] = fmin(fmax(0.f, -dir), 1.f);
+            r[i] = (obj->mtl ? obj->mtl->diffuse.x : 0.f) * fmin(fmax(0.f, -dir), 1.f);
+            g[i] = (obj->mtl ? obj->mtl->diffuse.y : 1.f) * fmin(fmax(0.f, -dir), 1.f);
+            b[i] = (obj->mtl ? obj->mtl->diffuse.z : 1.f) * fmin(fmax(0.f, -dir), 1.f);
         }
         vec4_t sp[3];
         sp[0] = world_to_screen_coords(p[0], camera);

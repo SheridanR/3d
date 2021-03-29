@@ -7,3 +7,4 @@
 external/*
 *.arm64
 .DS_Store
+vs.2019/*

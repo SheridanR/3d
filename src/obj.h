@@ -3,6 +3,7 @@
 
 #include "vec4.h"
 #include "camera.h"
+#include "mtl.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -20,6 +21,8 @@ typedef struct obj {
     size_t num_coords[VB_NUM];
     uint32_t* indices[VB_NUM];
     size_t num_indices[VB_NUM];
+    mtllib_t mtllib;
+    mtl_t* mtl;
 } obj_t;
 
 obj_t* load_obj(obj_t* result, const char* filename);

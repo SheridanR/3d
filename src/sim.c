@@ -6,6 +6,7 @@
 #include "quat.h"
 #include "vec4.h"
 #include "obj.h"
+#include <string.h>
 
 bool running;
 camera_t camera;
@@ -58,7 +59,5 @@ void update() {
 }
 
 void close() {
-    if (obj.valid) {
-        free_obj(&obj);
-    }
+    free_obj(&obj);
 }
