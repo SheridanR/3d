@@ -22,7 +22,8 @@ typedef struct obj {
     uint32_t* indices[VB_NUM];
     size_t num_indices[VB_NUM];
     mtllib_t mtllib;
-    mtl_t* mtl;
+    mtl_t* mtl[MATERIAL_LIMIT];
+    uint32_t mtl_indices[MATERIAL_LIMIT];
 } obj_t;
 
 obj_t* load_obj(obj_t* result, const char* filename);

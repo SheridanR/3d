@@ -13,6 +13,7 @@ obj_t* load_obj(obj_t* result, const char* filename) {
         result->valid = false;
         return NULL;
     }
+    uint32_t material_index = 0;
     while (fgets(buf, sizeof(buf), fp)) {
         if (buf[0] != '#' && buf[0] != '\n') {
             char* type = strtok(buf, " ");
@@ -39,6 +40,9 @@ obj_t* load_obj(obj_t* result, const char* filename) {
             else if (strcmp(type, "mtllib") == 0) {
                 char buf[128] = {'\0'};
                 char* prefix = strrchr(filename, '/');
+                if (!prefix) {
+                    prefix = strrchr(filename, '\\');
+                }
                 strncpy(buf, filename, (size_t)(prefix - filename + 1));
                 char* name = strtok(NULL, " \r\n");
                 strcat(buf, name);
@@ -55,7 +59,9 @@ obj_t* load_obj(obj_t* result, const char* filename) {
                 for (int c = 0; c < MATERIAL_LIMIT; ++c) {
                     mtl_t* mtl = &result->mtllib.materials[c];
                     if (strcmp(mtl->filename, buf) == 0) {
-                        result->mtl = mtl;
+                        result->mtl_indices[material_index] = result->num_indices[VB_POSITION];
+                        result->mtl[material_index++] = mtl;
+                        break;
                     }
                 }
             }
@@ -134,7 +140,13 @@ void free_obj(obj_t* obj) {
 
 void draw_obj(const obj_t* obj, const camera_t* camera) {
     vec4_t camera_dir = quat_to_vec3(&camera->ang);
+    int material_index = -1; mtl_t* mtl = NULL;
     for (int c = 0; c < obj->num_indices[VB_POSITION] - 2; c += 3) {
+        if (material_index < MATERIAL_LIMIT - 1 &&
+            c >= obj->mtl_indices[material_index + 1] &&
+            obj->mtl[material_index + 1]) {
+            mtl = obj->mtl[++material_index];
+        }
         const vec4_t* p[3] = {
             &obj->coords[VB_POSITION][obj->indices[VB_POSITION][c]],
             &obj->coords[VB_POSITION][obj->indices[VB_POSITION][c + 1]],
@@ -165,9 +177,9 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
                 goto next; // backface culling
             }
             const float dir = dot_vec4(&diff, n[i]);
-            r[i] = (obj->mtl ? obj->mtl->diffuse.x : 0.f) * fmin(fmax(0.f, -dir), 1.f);
-            g[i] = (obj->mtl ? obj->mtl->diffuse.y : 1.f) * fmin(fmax(0.f, -dir), 1.f);
-            b[i] = (obj->mtl ? obj->mtl->diffuse.z : 1.f) * fmin(fmax(0.f, -dir), 1.f);
+            r[i] = (mtl ? mtl->diffuse.x : 1.f) * fmin(fmax(0.f, -dir), 1.f);
+            g[i] = (mtl ? mtl->diffuse.y : 1.f) * fmin(fmax(0.f, -dir), 1.f);
+            b[i] = (mtl ? mtl->diffuse.z : 1.f) * fmin(fmax(0.f, -dir), 1.f);
         }
         vec4_t sp[3];
         sp[0] = world_to_screen_coords(p[0], camera);

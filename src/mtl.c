@@ -65,6 +65,9 @@ mtllib_t* load_mtllib(mtllib_t* result, const char* filename) {
             else if (strcmp(type, "map_Kd") == 0) {
                 char buf[128] = {'\0'};
                 char* prefix = strrchr(filename, '/');
+                if (!prefix) {
+                    prefix = strrchr(filename, '\\');
+                }
                 strncpy(buf, prefix, (size_t)(prefix - filename + 1));
                 char* name = strtok(NULL, " \r\n");
                 strcat(buf, name);
