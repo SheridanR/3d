@@ -1,7 +1,7 @@
 # 3d
 a simple 3d software renderer in < 1000 lines of C.
 
-![picture of a cube](https://raw.githubusercontent.com/SheridanR/3d/master/screenshot.png)
+![picture of a 3d object](https://raw.githubusercontent.com/SheridanR/3d/master/screenshot.png)
 
 ## Compiling
 You need will SDL2 to build the project. (https://www.libsdl.org/download-2.0.php)
