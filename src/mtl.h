@@ -20,7 +20,7 @@ typedef struct mtl {
     texture_t diffuse_texture;
 } mtl_t;
 
-#define MATERIAL_LIMIT 4
+#define MATERIAL_LIMIT 16
 
 typedef struct mtllib {
     mtl_t materials[MATERIAL_LIMIT];

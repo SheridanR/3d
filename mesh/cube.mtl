@@ -1,4 +1,35 @@
-newmtl Material
+newmtl Face1
 illum 2
 Ka 0.000000 0.000000 0.000000
-Kd 1.000000 1.000000 1.000000
+Kd 1.000000 0.000000 0.000000
+map_Kd cube.png
+
+newmtl Face2
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 1.000000 1.000000
+map_Kd cube.png
+
+newmtl Face3
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 1.000000 0.000000
+map_Kd cube.png
+
+newmtl Face4
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 1.000000
+map_Kd cube.png
+
+newmtl Face5
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 0.000000 1.000000
+map_Kd cube.png
+
+newmtl Face6
+illum 2
+Ka 0.000000 0.000000 0.000000
+Kd 1.000000 1.000000 0.000000
+map_Kd cube.png
