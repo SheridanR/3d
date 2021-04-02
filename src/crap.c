@@ -4,7 +4,7 @@
 #include "draw.h"
 #include <SDL2/SDL.h>
 #ifdef TEXTURES
-#include <SDL2/SDL_image.h>
+#include <SDL2_image/SDL_image.h>
 #endif
 
 static SDL_Window* window;
