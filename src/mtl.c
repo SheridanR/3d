@@ -1,7 +1,7 @@
 #include "mtl.h"
+#include "crap.h"
 #ifdef TEXTURES
-#include <SDL2/SDL.h>
-#include <SDL2_image/SDL_image.h>
+#include INCLUDE_SDL2_IMAGE
 #endif
 #include <stdlib.h>
 #include <string.h>

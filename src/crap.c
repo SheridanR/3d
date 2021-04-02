@@ -3,9 +3,7 @@
 #include "sim.h"
 #include "draw.h"
 #include <SDL2/SDL.h>
-#ifdef TEXTURES
-#include <SDL2_image/SDL_image.h>
-#endif
+#include INCLUDE_SDL2_IMAGE
 
 static SDL_Window* window;
 static SDL_Surface* surface;
