@@ -18,9 +18,10 @@ void setup(const char* filename) {
     (void)load_obj(&obj, filename);
 
     camera.ang = quat();
+    mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, 0.f, (float)PI)));
     mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, (float)PI / 4.f, 0.f)));
     mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat((float)PI / 6.f, 0.f, 0.f)));
-    camera.pos = (vec4_t){2.f, -1.f, 2.f, 0.f};
+    camera.pos = (vec4_t){-3.f, 3.f, 3.f, 0.f};
     camera.fov = 60.f * (float)PI / 180.f;
     camera_update(&camera);
 }
