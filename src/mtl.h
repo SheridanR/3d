@@ -12,6 +12,8 @@ typedef struct texture {
     uint32_t* pixels;
     int width;
     int height;
+    uint32_t shift[4];
+    uint32_t mask[4];
 } texture_t;
 
 typedef struct mtl {

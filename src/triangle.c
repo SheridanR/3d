@@ -35,7 +35,7 @@ static inline void triangle_span(
                 const int ui = dmin(dmax(0, u * t->width), t->width);
                 const int vi = dmin(dmax(0, (1.f - v) * t->height), t->height);
                 uint32_t c = t->pixels[vi * t->width + ui];
-                pixel(x, y, color((c & 0x000000ff) * r, ((c & 0x0000ff00) >> 8) * g, ((c & 0x00ff0000) >> 16) * b, 255));
+                pixel(x, y, color(((c & t->mask[0]) >> t->shift[0]) * r, ((c & t->mask[1]) >> t->shift[1]) * g, ((c & t->mask[2]) >> t->shift[2]) * b, 255));
                 write_depth(x, y, z);
             }
             z += z_inc; r += r_inc; g += g_inc;

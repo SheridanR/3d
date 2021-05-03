@@ -47,9 +47,9 @@ void update() {
         add_vec4(&camera.pos, &vec4_copy(camera.pos), &move);
 
         const float turnSpeed = (1.f / fps) * (float)PI / 2.f;
-        const float turnX = (keystatus[SDL_SCANCODE_KP_5] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_8] ? 1.f : 0.f);
-        const float turnY = (keystatus[SDL_SCANCODE_KP_4] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_6] ? 1.f : 0.f);
-        const float turnZ = (keystatus[SDL_SCANCODE_KP_9] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_KP_7] ? 1.f : 0.f);
+        const float turnX = (keystatus[SDL_SCANCODE_K] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_I] ? 1.f : 0.f);
+        const float turnY = (keystatus[SDL_SCANCODE_J] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_L] ? 1.f : 0.f);
+        const float turnZ = (keystatus[SDL_SCANCODE_O] ? 1.f : 0.f) - (keystatus[SDL_SCANCODE_U] ? 1.f : 0.f);
 
         mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(turnSpeed * turnX, 0.f, 0.f)));
         mul_quat(&camera.ang, &quat_copy(camera.ang), &quat_copy(euler_to_quat(0.f, turnSpeed * turnY, 0.f)));

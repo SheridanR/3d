@@ -16,10 +16,12 @@ static texture_t* load_texture(texture_t* result, const char* filename) {
         return NULL;
     } else {
         strcpy(result->filename, filename);
-        result->surface = surf;
-        result->pixels = surf->pixels;
-        result->width = surf->w;
-        result->height = surf->h;
+        result->surface = surf; result->pixels = surf->pixels;
+        result->width = surf->w; result->height = surf->h;
+        result->mask[0] = surf->format->Rmask; result->mask[1] = surf->format->Gmask;
+        result->mask[2] = surf->format->Bmask; result->mask[3] = surf->format->Amask;
+        result->shift[0] = surf->format->Rshift; result->shift[1] = surf->format->Gshift;
+        result->shift[2] = surf->format->Bshift; result->shift[3] = surf->format->Ashift;
         return result;
     }
 #endif
