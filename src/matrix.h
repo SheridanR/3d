@@ -19,7 +19,7 @@ typedef struct mat4x4 {
     M.z.x, M.z.y, M.z.z, M.z.w,\
     M.w.x, M.w.y, M.w.z, M.w.w,\
 })
-extern inline mat4x4_t* mul_mat(mat4x4_t* result, const mat4x4_t* m1, const mat4x4_t* m2);
-extern inline vec4_t* mul_mat_vec4(vec4_t* result, const mat4x4_t* m, const vec4_t* v);
+extern inline mat4x4_t* mul_mat(mat4x4_t* restrict result, const mat4x4_t* restrict m1, const mat4x4_t* restrict m2);
+extern inline vec4_t* mul_mat_vec4(vec4_t* restrict result, const mat4x4_t* restrict m, const vec4_t* restrict v);
 
 #endif

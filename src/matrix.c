@@ -1,7 +1,7 @@
 #include "matrix.h"
 #include "vec4.h"
 
-mat4x4_t* mul_mat(mat4x4_t* result, const mat4x4_t* m1, const mat4x4_t* m2) {
+mat4x4_t* mul_mat(mat4x4_t* restrict result, const mat4x4_t* restrict m1, const mat4x4_t* restrict m2) {
     (void)add_vec4(
         &result->x,
         add_vec4(&vec4(0.f), pow_vec4(&vec4(0.f), &m1->x, m2->x.x), pow_vec4(&vec4(0.f), &m1->y, m2->x.y)),
@@ -25,7 +25,7 @@ mat4x4_t* mul_mat(mat4x4_t* result, const mat4x4_t* m1, const mat4x4_t* m2) {
     return result;
 }
 
-vec4_t* mul_mat_vec4(vec4_t* result, const mat4x4_t* m, const vec4_t* v) {
+vec4_t* mul_mat_vec4(vec4_t* restrict result, const mat4x4_t* restrict m, const vec4_t* restrict v) {
     result->x = m->x.x * v->x + m->y.x * v->y + m->z.x * v->z + m->w.x * v->w;
     result->y = m->x.y * v->x + m->y.y * v->y + m->z.y * v->z + m->w.y * v->w;
     result->z = m->x.z * v->x + m->y.z * v->y + m->z.z * v->z + m->w.z * v->w;

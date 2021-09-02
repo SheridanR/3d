@@ -1,7 +1,7 @@
 #include "quat.h"
 #include <math.h>
 
-quat_t euler_to_quat(float pitch, float yaw, float roll) {
+quat_t euler_to_quat(const float pitch, const float yaw, const float roll) {
     quat_t result;
     vec4_t c = {cosf(pitch * 0.5f), cosf(yaw * 0.5f), cosf(roll * 0.5f), 0.f};
     vec4_t s = {sinf(pitch * 0.5f), sinf(yaw * 0.5f), sinf(roll * 0.5f), 0.f};
@@ -12,7 +12,7 @@ quat_t euler_to_quat(float pitch, float yaw, float roll) {
     return result;
 }
 
-mat4x4_t quat_to_mat(const quat_t* q) {
+mat4x4_t quat_to_mat(const quat_t* restrict q) {
     mat4x4_t result;
     result.x.x = 1.f - 2.f * (q->y * q->y + q->z * q->z);
     result.x.y = 2.f * (q->x * q->y + q->w * q->z);
@@ -33,7 +33,7 @@ mat4x4_t quat_to_mat(const quat_t* q) {
     return result;
 }
 
-quat_t* mul_quat(quat_t* result, const quat_t* a, const quat_t* b) {
+quat_t* mul_quat(quat_t* restrict result, const quat_t* restrict a, const quat_t* restrict b) {
     result->x = a->w * b->x + a->x * b->w + a->y * b->z - a->z * b->y;
     result->y = a->w * b->y + a->y * b->w + a->z * b->x - a->x * b->z;
     result->z = a->w * b->z + a->z * b->w + a->x * b->y - a->y * b->x;
@@ -41,7 +41,7 @@ quat_t* mul_quat(quat_t* result, const quat_t* a, const quat_t* b) {
     return result;
 }
 
-vec4_t quat_to_vec3(const quat_t* q) {
+vec4_t quat_to_vec3(const quat_t* restrict q) {
     vec4_t v = {0.f, 0.f, -1.f, 0.f};
     vec4_t qv = {-q->x, -q->y, -q->z, -q->w};
     vec4_t t;

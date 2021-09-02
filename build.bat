@@ -1,4 +1,5 @@
 cl ^
+/O2 ^
 /DTEXTURES ^
 src/*.c ^
 /Iexternal/include ^
