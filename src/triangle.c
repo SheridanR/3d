@@ -96,14 +96,57 @@ void line(int x0, int y0, int x1, int y1) {
     }
 }
 
+void double_line(int x00, int x10, int y0, int x01, int x11, int y1) {
+    const int dx0 = abs(x01 - x00);
+    const int xi0 = x00 < x01 ? 1 : -1;
+    const int dx1 = abs(x11 - x10);
+    const int xi1 = x10 < x11 ? 1 : -1;
+    const int dy = -abs(y1 - y0);
+    const int yi = y0 < y1 ? 1 : -1;
+    int err0 = dx0 + dy;
+    int err1 = dx1 + dy;
+
+    check_pixel(x00, y0, color(255, 0, 0, 255));
+    check_pixel(x10, y0, color(255, 0, 0, 255));
+
+    while (1) {
+        if (y0 == y1 && x00 == x01 && x10 == x11) {
+            break;
+        }
+        const int err02 = 2 * err0;
+        const int err12 = 2 * err1;
+        if (err02 >= dy) {
+            err0 += dy;
+            if (x00 != x01) {
+                x00 += xi0;
+                check_pixel(x00, y0, color(255, 0, 0, 255));
+            }
+        }
+        if (err12 >= dy) {
+            err1 += dy;
+            if (x10 != x11) {
+                x10 += xi1;
+                check_pixel(x10, y0, color(255, 0, 0, 255));
+            }
+        }
+        if (err02 <= dx0 && err12 <= dx1) {
+            err0 += dx0;
+            err1 += dx1;
+            y0 += yi;
+            check_pixel(x00, y0, color(255, 0, 0, 255));
+            check_pixel(x10, y0, color(255, 0, 0, 255));
+        }
+    }
+}
+
 static inline void triangle_half(
     const point_t p[3], int mode,
-    int a, const int b[4], int c, mtl_t* mtl
+    const int b[4], int c, mtl_t* mtl
     ) {
     const int x00 = (int)p[b[1]].x; const int x01 = (int)p[b[0]].x;
     const int x10 = (int)p[b[3]].x; const int x11 = (int)p[b[2]].x;
     const int y0 = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
-    const int y1 = (int)p[a].y <= 0 ? -1 : ((int)p[a].y >= YRES ? YRES - 1 : (int)p[a].y);
+    const int y1 = (int)p[2].y <= 0 ? -1 : ((int)p[2].y >= YRES ? YRES - 1 : (int)p[2].y);
     if (y0 == YRES || y1 == -1) {
         return;
     }
@@ -128,30 +171,92 @@ static inline void triangle_half(
     float u0 = p[c].u + u_inc0 * yoff; float u1 = p[c].u + u_inc1 * yoff;
     float v0 = p[c].v + v_inc0 * yoff; float v1 = p[c].v + v_inc1 * yoff;
 
+    const int beginy = p[0].y; const int endy = p[2].y;
     const int dx0 = abs(x01 - x00); const int x0_inc = x00 < x01 ? 1 : -1;
     const int dx1 = abs(x11 - x10); const int x1_inc = x10 < x11 ? 1 : -1;
-    const int dy = -abs(p[a].y - p[0].y); const int y_inc = p[0].y < p[a].y ? 1 : -1;
+    const int dy = -abs(endy - beginy); const int y_inc = (int)beginy < (int)endy ? 1 : -1;
     int err0 = dx0 + dy; int err1 = dx1 + dy;
-    int x0 = x00; int x1 = x10; int y = p[0].y;
+    int x0 = x00; int x1 = x10; int y = beginy;
 
-    while (1) {
-        check_pixel(x0, y, color(255, 0, 0, 255));
-        check_pixel(x1, y, color(255, 0, 0, 255));
-        if (y == y1 && x0 == x01 && x1 == x11) {
-            break;
+    //line(x00, p[0].y, x01, p[a].y);
+    //line(x10, p[0].y, x11, p[a].y);
+    //double_line(x00, x10, p[0].y, x01, x11, p[a].y);
+
+#define YITERATE() \
+    const int err02 = 2 * err0; const int err12 = 2 * err1; \
+    {\
+        if (y == endy && x0 == x01 && x1 == x11) {\
+            break;\
+        }\
+        if (err02 >= dy) {\
+            err0 += dy;\
+            if (x0 != x01) {\
+                x0 += x0_inc;\
+            }\
+        }\
+        if (err12 >= dy) {\
+            err1 += dy;\
+            if (x1 != x11) {\
+                x1 += x1_inc;\
+            }\
+        }\
+    }
+
+    //check_pixel(x0, y, color(255, 0, 0, 255));
+    //check_pixel(x1, y, color(255, 0, 0, 255));
+    if (x01 < x11) {
+        while (1) {
+            YITERATE()
+            if (err02 <= dx0 && err12 <= dx1) {
+                err0 += dx0; err1 += dx1; y += y_inc;
+                if (y >= 0 && y < YRES) {
+                    triangle_span(y, x0, x1, z0, z1,
+                        r0, r1, g0, g1, b0, b1,
+                        u0, u1, v0, v1, mtl);
+                    z0 += z_inc0; z1 += z_inc1; r0 += r_inc0; r1 += r_inc1;
+                    g0 += g_inc0; g1 += g_inc1; b0 += b_inc0; b1 += b_inc1;
+                    u0 += u_inc0; u1 += u_inc1; v0 += v_inc0; v1 += v_inc1;
+                    /*const float bz0 = fmax(z1, z_min); const float bz1 = fmin(z0, z_max);
+                    const float br0 = fmax(r1, r_min); const float br1 = fmin(r0, r_max);
+                    const float bg0 = fmax(g1, g_min); const float bg1 = fmin(g0, g_max);
+                    const float bb0 = fmax(b1, b_min); const float bb1 = fmin(b0, b_max);
+                    const float bu0 = fmax(u1, u_min); const float bu1 = fmin(u0, u_max);
+                    const float bv0 = fmax(v1, v_min); const float bv1 = fmin(v0, v_max);
+                    triangle_span(y, x0, x1, bz0, bz1,
+                        br0, br1, bg0, bg1, bb0, bb1,
+                        bu0, bu1, bv0, bv1, mtl);
+                    z0 += z_inc0; z1 += z_inc1; r0 += r_inc0; r1 += r_inc1;
+                    g0 += g_inc0; g1 += g_inc1; b0 += b_inc0; b1 += b_inc1;
+                    u0 += u_inc0; u1 += u_inc1; v0 += v_inc0; v1 += v_inc1;*/
+                }
+            }
         }
-        const int err02 = 2 * err0; const int err12 = 2 * err1;
-        if (err02 >= dy && (x0 != x01 || y != y1)) {
-            err0 += dy;
-            x0 += x0_inc;
-        }
-        if (err12 >= dy && (x1 != x11 || y != y1)) {
-            err1 += dy;
-            x1 += x1_inc;
-        }
-        if (err02 <= dx0 && err12 <= dx1) {
-            err0 += dx0; err1 += dx1;
-            y += y_inc;
+    } else {
+        while (1) {
+            YITERATE()
+            if (err02 <= dx0 && err12 <= dx1) {
+                err0 += dx0; err1 += dx1; y += y_inc;
+                if (y >= 0 && y < YRES) {
+                    triangle_span(y, x1, x0, z1, z0,
+                        r1, r0, g1, g0, b1, b0,
+                        u1, u0, v1, v0, mtl);
+                    z0 += z_inc0; z1 += z_inc1; r0 += r_inc0; r1 += r_inc1;
+                    g0 += g_inc0; g1 += g_inc1; b0 += b_inc0; b1 += b_inc1;
+                    u0 += u_inc0; u1 += u_inc1; v0 += v_inc0; v1 += v_inc1;
+                    /*const float bz0 = fmax(z1, z_min); const float bz1 = fmin(z0, z_max);
+                    const float br0 = fmax(r1, r_min); const float br1 = fmin(r0, r_max);
+                    const float bg0 = fmax(g1, g_min); const float bg1 = fmin(g0, g_max);
+                    const float bb0 = fmax(b1, b_min); const float bb1 = fmin(b0, b_max);
+                    const float bu0 = fmax(u1, u_min); const float bu1 = fmin(u0, u_max);
+                    const float bv0 = fmax(v1, v_min); const float bv1 = fmin(v0, v_max);
+                    triangle_span(y, x1, x0, bz0, bz1,
+                        br0, br1, bg0, bg1, bb0, bb1,
+                        bu0, bu1, bv0, bv1, mtl);
+                    z0 += z_inc0; z1 += z_inc1; r0 += r_inc0; r1 += r_inc1;
+                    g0 += g_inc0; g1 += g_inc1; b0 += b_inc0; b1 += b_inc1;
+                    u0 += u_inc0; u1 += u_inc1; v0 += v_inc0; v1 += v_inc1;*/
+                }
+            }
         }
     }
 
@@ -196,8 +301,8 @@ static inline void swap(point_t* p0, point_t* p1) {
     *p1 = t;
 }
 
-#define TRIANGLE_TOP(P) triangle_half(P, 1, 1, (int[4]){1, 0, 2, 0}, 0, mtl)
-#define TRIANGLE_BOT(P) triangle_half(P, -1, 2, (int[4]){2, 0, 2, 1}, 2, mtl)
+#define TRIANGLE_TOP(P) triangle_half(P, 1, (int[4]){1, 0, 2, 0}, 0, mtl)
+#define TRIANGLE_BOT(P) triangle_half(P, -1, (int[4]){2, 0, 2, 1}, 2, mtl)
 
 void draw_triangle(point_t p0, point_t p1, point_t p2, mtl_t* mtl) {
     point_t p[3] = {p0, p1, p2};
