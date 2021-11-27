@@ -35,12 +35,22 @@ Place the headers/libs for SDL2 under a folder named `external`, then run build.
 ### macOS
 Install the latest version of xcode and the SDL2 Framework, then run build.sh.
 
+### Linux
+Install dev packages for SDL2 (and optionally SDL2_image) from your favorite repository, then simply run the following command:
+```
+gcc src/*.c -w -lSDL2 -lm
+```
+With textures:
+```
+gcc -DTEXTURES src/*.c -w -lSDL2_image -lm
+```
+
 ## Running
 Drag a wavefront .obj file (3D model) onto the executable from your file manager, or specify a path to it as an argument.
 
 By default, the program tries to load the file from `mesh/cube.obj`
 
-You can fly around and inspect the model with WASDQE and the numpad keys.
+You can fly around and inspect the model with WASDQE and the numpad keys (or IJKLUO keys if the numpad is unavailable).
 
 ## Contact
 Reach out to sheridan.rathbun@gmail.com with comments, suggestions, etc.
