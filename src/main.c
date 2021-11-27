@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
         draw();         // draw on the backbuffer
         refresh();      // flip the backbuffer to the front
     }
-    close();            // destroy world sim
+    quit();             // destroy world sim
     term();             // destroy window
     return 0;
 }

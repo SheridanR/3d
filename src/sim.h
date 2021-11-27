@@ -11,6 +11,6 @@ extern obj_t obj;
 
 void setup(const char* filename);
 void update();
-void close();
+void quit();
 
 #endif

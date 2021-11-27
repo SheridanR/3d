@@ -62,6 +62,6 @@ void update() {
     }
 }
 
-void close() {
+void quit() {
     free_obj(&obj);
 }
