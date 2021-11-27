@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <time.h>
 
-#define FRAMES_PER_SECOND 60
 #define MAX_FRAMES_BEFORE_DROP 4
 static double last = 0.0;
 static double diff = 0.0;

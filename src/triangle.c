@@ -54,11 +54,12 @@ static inline void triangle_span(
 
 static inline void triangle_half(
     const point_t p[3], int mode,
-    int a, const int b[4], int c, mtl_t* mtl
+    const int b[4], mtl_t* mtl
     ) {
-    int starty = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
-    int endy = (int)p[a].y <= 0 ? -1 : ((int)p[a].y >= YRES ? YRES - 1 : (int)p[a].y);
-    if (starty == YRES || endy == -1) {
+    const int last_scan = 1 - mode;
+    int topy = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
+    int boty = (int)p[2].y <= 0 ? -1 : ((int)p[2].y >= YRES ? YRES - 1 : (int)p[2].y);
+    if (topy == YRES || boty == -1) {
         return;
     }
     const float x_min = fmin(p[0].x, fmin(p[1].x, p[2].x)); const float x_max = fmax(p[0].x, fmax(p[1].x, p[2].x));
@@ -77,51 +78,39 @@ static inline void triangle_half(
     const float b_inc0 = (p[b[0]].b - p[b[1]].b) * y_diff0; const float b_inc1 = (p[b[2]].b - p[b[3]].b) * y_diff1;
     const float u_inc0 = (p[b[0]].u - p[b[1]].u) * y_diff0; const float u_inc1 = (p[b[2]].u - p[b[3]].u) * y_diff1;
     const float v_inc0 = (p[b[0]].v - p[b[1]].v) * y_diff0; const float v_inc1 = (p[b[2]].v - p[b[3]].v) * y_diff1;
-    const int yoff = mode > 0 ? abs(starty - (int)p[0].y) : abs(endy - (int)p[2].y);
-    float x0 = p[c].x + x_inc0 * yoff; float x1 = p[c].x + x_inc1 * yoff;
-    float z0 = p[c].z + z_inc0 * yoff; float z1 = p[c].z + z_inc1 * yoff;
-    float r0 = p[c].r + r_inc0 * yoff; float r1 = p[c].r + r_inc1 * yoff;
-    float g0 = p[c].g + g_inc0 * yoff; float g1 = p[c].g + g_inc1 * yoff;
-    float b0 = p[c].b + b_inc0 * yoff; float b1 = p[c].b + b_inc1 * yoff;
-    float u0 = p[c].u + u_inc0 * yoff; float u1 = p[c].u + u_inc1 * yoff;
-    float v0 = p[c].v + v_inc0 * yoff; float v1 = p[c].v + v_inc1 * yoff;
-    int begin = mode > 0 ? starty : endy;
-    int end = mode > 0 ? endy : starty;
+    const int yoff = mode > 0 ? abs(topy - (int)p[0].y) : abs(boty - (int)p[2].y);
+    float x0 = p[last_scan].x + x_inc0 * yoff; float x1 = p[last_scan].x + x_inc1 * yoff;
+    float z0 = p[last_scan].z + z_inc0 * yoff; float z1 = p[last_scan].z + z_inc1 * yoff;
+    float r0 = p[last_scan].r + r_inc0 * yoff; float r1 = p[last_scan].r + r_inc1 * yoff;
+    float g0 = p[last_scan].g + g_inc0 * yoff; float g1 = p[last_scan].g + g_inc1 * yoff;
+    float b0 = p[last_scan].b + b_inc0 * yoff; float b1 = p[last_scan].b + b_inc1 * yoff;
+    float u0 = p[last_scan].u + u_inc0 * yoff; float u1 = p[last_scan].u + u_inc1 * yoff;
+    float v0 = p[last_scan].v + v_inc0 * yoff; float v1 = p[last_scan].v + v_inc1 * yoff;
+    const int starty = mode > 0 ? topy : boty;
+    const int endy = mode > 0 ? boty : topy;
+#define BOUND(x0, x1, z0, z1, r0, r1, g0, g1, b0, b1, u0, u1, v0, v1)\
+        int bx0 = (int)fmax(x0, x_min); int bx1 = (int)fmin(x1, x_max);\
+        float bz0 = fmax(z0, z_min); float bz1 = fmin(z1, z_max);\
+        float br0 = fmax(r0, r_min); float br1 = fmin(r1, r_max);\
+        float bg0 = fmax(g0, g_min); float bg1 = fmin(g1, g_max);\
+        float bb0 = fmax(b0, b_min); float bb1 = fmin(b1, b_max);\
+        float bu0 = fmax(u0, u_min); float bu1 = fmin(u1, u_max);\
+        float bv0 = fmax(v0, v_min); float bv1 = fmin(v1, v_max);
+#define SPAN()\
+        triangle_span(y, bx0, bx1, bz0, bz1, br0, br1, bg0, bg1, bb0, bb1, bu0, bu1, bv0, bv1, mtl);\
+        x0 += x_inc0; x1 += x_inc1; z0 += z_inc0; z1 += z_inc1;\
+        r0 += r_inc0; r1 += r_inc1; g0 += g_inc0; g1 += g_inc1;\
+        b0 += b_inc0; b1 += b_inc1; u0 += u_inc0; u1 += u_inc1;\
+        v0 += v_inc0; v1 += v_inc1;
     if (x_inc0 < x_inc1) {
-        for (int y = begin; mode > 0 ? (y <= end) : (y >= end); y += mode) {
-            int bx0 = (int)fmax(x0, x_min);
-            int bx1 = (int)fmin(x1, x_max);
-            float bz0 = fmax(z0, z_min); float bz1 = fmin(z1, z_max);
-            float br0 = fmax(r0, r_min); float br1 = fmin(r1, r_max);
-            float bg0 = fmax(g0, g_min); float bg1 = fmin(g1, g_max);
-            float bb0 = fmax(b0, b_min); float bb1 = fmin(b1, b_max);
-            float bu0 = fmax(u0, u_min); float bu1 = fmin(u1, u_max);
-            float bv0 = fmax(v0, v_min); float bv1 = fmin(v1, v_max);
-            triangle_span(y, bx0, bx1, bz0, bz1,
-                br0, br1, bg0, bg1, bb0, bb1,
-                bu0, bu1, bv0, bv1, mtl);
-            x0 += x_inc0; x1 += x_inc1; z0 += z_inc0; z1 += z_inc1;
-            r0 += r_inc0; r1 += r_inc1; g0 += g_inc0; g1 += g_inc1;
-            b0 += b_inc0; b1 += b_inc1; u0 += u_inc0; u1 += u_inc1;
-            v0 += v_inc0; v1 += v_inc1;
+        for (int y = starty; mode > 0 ? (y <= endy) : (y >= endy); y += mode) {
+            BOUND(x0, x1, z0, z1, r0, r1, g0, g1, b0, b1, u0, u1, v0, v1)
+            SPAN()
         }
     } else {
-        for (int y = begin; mode > 0 ? (y <= end) : (y >= end); y += mode) {
-            int bx0 = (int)fmax(x1, x_min);
-            int bx1 = (int)fmin(x0, x_max);
-            float bz0 = fmax(z1, z_min); float bz1 = fmin(z0, z_max);
-            float br0 = fmax(r1, r_min); float br1 = fmin(r0, r_max);
-            float bg0 = fmax(g1, g_min); float bg1 = fmin(g0, g_max);
-            float bb0 = fmax(b1, b_min); float bb1 = fmin(b0, b_max);
-            float bu0 = fmax(u1, u_min); float bu1 = fmin(u0, u_max);
-            float bv0 = fmax(v1, v_min); float bv1 = fmin(v0, v_max);
-            triangle_span(y, bx0, bx1, bz0, bz1,
-                br0, br1, bg0, bg1, bb0, bb1,
-                bu0, bu1, bv0, bv1, mtl);
-            x0 += x_inc0; x1 += x_inc1; z0 += z_inc0; z1 += z_inc1;
-            r0 += r_inc0; r1 += r_inc1; g0 += g_inc0; g1 += g_inc1;
-            b0 += b_inc0; b1 += b_inc1; u0 += u_inc0; u1 += u_inc1;
-            v0 += v_inc0; v1 += v_inc1;
+        for (int y = starty; mode > 0 ? (y <= endy) : (y >= endy); y += mode) {
+            BOUND(x1, x0, z1, z0, r1, r0, g1, g0, b1, b0, u1, u0, v1, v0)
+            SPAN()
         }
     }
 }
@@ -132,8 +121,8 @@ static inline void swap(point_t* p0, point_t* p1) {
     *p1 = t;
 }
 
-#define TRIANGLE_TOP(P) triangle_half(P, 1, 1, (int[4]){1, 0, 2, 0}, 0, mtl)
-#define TRIANGLE_BOT(P) triangle_half(P, -1, 2, (int[4]){2, 0, 2, 1}, 2, mtl)
+#define TRIANGLE_TOP(P) triangle_half(P, 1, (int[4]){1, 0, 2, 0}, mtl)
+#define TRIANGLE_BOT(P) triangle_half(P, -1, (int[4]){2, 0, 2, 1}, mtl)
 
 void draw_triangle(point_t p0, point_t p1, point_t p2, mtl_t* mtl) {
     point_t p[3] = {p0, p1, p2};
