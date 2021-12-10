@@ -40,6 +40,6 @@ void clear() {
 
 void draw() {
     if (obj.valid) {
-        draw_obj(&obj, &camera);
+        draw_obj(&obj, &mat4x4(1.f), &camera);
     }
 }

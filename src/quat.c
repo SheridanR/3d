@@ -14,22 +14,13 @@ quat_t euler_to_quat(const float pitch, const float yaw, const float roll) {
 
 mat4x4_t quat_to_mat(const quat_t* restrict q) {
     mat4x4_t result;
-    result.x.x = 1.f - 2.f * (q->y * q->y + q->z * q->z);
-    result.x.y = 2.f * (q->x * q->y + q->w * q->z);
-    result.x.z = 2.f * (q->x * q->z - q->w * q->y);
-    result.x.w = 0.f;
-    result.y.x = 2.f * (q->x * q->y - q->w * q->z);
-    result.y.y = 1.f - 2.f * (q->x * q->x + q->z * q->z);
-    result.y.z = 2.f * (q->y * q->z + q->w * q->x);
-    result.y.w = 0.f;
-    result.z.x = 2.f * (q->x * q->z + q->w * q->y);
-    result.z.y = 2.f * (q->y * q->z - q->w * q->x);
-    result.z.z = 1.f - 2.f * (q->x * q->x + q->y * q->y);
-    result.z.w = 0.f;
-    result.w.x = 0.f;
-    result.w.y = 0.f;
-    result.w.z = 0.f;
-    result.w.w = 1.f;
+    result.x.x = 1.f - 2.f * (q->y * q->y + q->z * q->z); result.x.y = 2.f * (q->x * q->y + q->w * q->z);
+    result.x.z = 2.f * (q->x * q->z - q->w * q->y); result.x.w = 0.f;
+    result.y.x = 2.f * (q->x * q->y - q->w * q->z); result.y.y = 1.f - 2.f * (q->x * q->x + q->z * q->z);
+    result.y.z = 2.f * (q->y * q->z + q->w * q->x); result.y.w = 0.f;
+    result.z.x = 2.f * (q->x * q->z + q->w * q->y); result.z.y = 2.f * (q->y * q->z - q->w * q->x);
+    result.z.z = 1.f - 2.f * (q->x * q->x + q->y * q->y); result.z.w = 0.f;
+    result.w = (vec4_t){0.f, 0.f, 0.f, 1.f};
     return result;
 }
 
@@ -44,8 +35,7 @@ quat_t* mul_quat(quat_t* restrict result, const quat_t* restrict a, const quat_t
 vec4_t quat_to_vec3(const quat_t* restrict q) {
     vec4_t v = {0.f, 0.f, -1.f, 0.f};
     vec4_t qv = {-q->x, -q->y, -q->z, -q->w};
-    vec4_t t;
-    cross_vec3(&t, &qv, &v);
+    vec4_t t; cross_vec3(&t, &qv, &v);
     t.x *= 2.f; t.y *= 2.f; t.z *= 2.f; t.w = 0.f;
     vec4_t result;
     add_vec4(&result,

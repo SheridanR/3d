@@ -1,12 +1,13 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
+#include "vec4.h"
 #include <stdint.h>
 
 typedef struct vertex_t {
-    float x; float y; float z;
-    float r; float g; float b;
-    float u; float v;
+    vec4_t pos;
+    vec4_t color;
+    vec4_t uv;
 } vertex_t;
 
 typedef struct mtl mtl_t;

@@ -21,8 +21,7 @@ typedef struct camera {
     frustum_t frustum;  // view frustum
 } camera_t;
 
-vec4_t world_to_screen_coords(const vec4_t* world_coords, const camera_t* camera);
+vec4_t project_to_screen(const vec4_t* coords, const camera_t* camera);
 void camera_update(camera_t* camera);
-bool clip_line(const vec4_t* plane, const vec4_t* v0, const vec4_t* v1, vec4_t** intersection);
 
 #endif

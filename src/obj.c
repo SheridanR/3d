@@ -74,7 +74,7 @@ obj_t* load_obj(obj_t* result, const char* filename) {
                 char* c1 = strtok(NULL, " "); float f1 = strtof(c1, NULL);
                 char* c2 = strtok(NULL, " "); float f2 = strtof(c2, NULL);
                 char* c3 = strtok(NULL, " "); float f3 = strtof(c3, NULL);
-                result->coords[VB_POSITION][coords_count[VB_POSITION]++] = (vec4_t){f1, f2, f3, 0.f};
+                result->coords[VB_POSITION][coords_count[VB_POSITION]++] = (vec4_t){f1, f2, f3, 1.f};
             }
             else if (strcmp(type, "vt") == 0) {
                 char* c1 = strtok(NULL, " "); float f1 = strtof(c1, NULL);
@@ -132,7 +132,9 @@ void free_obj(obj_t* obj) {
     }
 }
 
-void draw_obj(const obj_t* obj, const camera_t* camera) {
+void draw_obj(const obj_t* obj, const mat4x4_t* model, const const camera_t* camera) {
+    mat4x4_t projview;
+    mul_mat(&projview, &camera->proj, &camera->view);
     vec4_t camera_dir = quat_to_vec3(&camera->ang);
     int material_index = -1; mtl_t* mtl = NULL;
     for (int c = 0; c < obj->num_indices[VB_POSITION] - 2; c += 3) {
@@ -159,41 +161,29 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
         vec4_t triangle_normal = vec4(0.f);
         cross_vec3(&triangle_normal, sub_vec4(&vec4(0.f), p[1], p[0]), sub_vec4(&vec4(0.f), p[2], p[0]));
         normal_vec4(&triangle_normal, &vec4_copy(triangle_normal));
-        float r[3], g[3], b[3];
-        for (int i = 0; i < 3; ++i) {
-            vec4_t diff = vec4(0.f);
-            sub_vec4(&diff, p[i], &camera->pos);
-            normal_vec4(&diff, &vec4_copy(diff));
-            if (dot_vec4(&diff, &triangle_normal) > 0.f) {
-                goto next; // backface culling
-            }
-            const float dir = dot_vec4(&diff, n[i]);
-            r[i] = (mtl ? mtl->diffuse.x : 1.f) * fmin(fmax(0.f, -dir), 1.f);
-            g[i] = (mtl ? mtl->diffuse.y : 1.f) * fmin(fmax(0.f, -dir), 1.f);
-            b[i] = (mtl ? mtl->diffuse.z : 1.f) * fmin(fmax(0.f, -dir), 1.f);
-        }
-        
-        int num_vertices = 0;
-        vertex_t v[32];
-        v[0] = (vertex_t){p[0]->x, p[0]->y, p[0]->z, r[0], g[0], b[0], t[0]->x, t[0]->y};
-        v[1] = (vertex_t){p[1]->x, p[1]->y, p[1]->z, r[1], g[1], b[1], t[1]->x, t[1]->y};
-        v[2] = (vertex_t){p[2]->x, p[2]->y, p[2]->z, r[2], g[2], b[2], t[2]->x, t[2]->y};
-        
-        float s;
-        float* result = &s;
-        bool dropped = false;
-        for (int c = 0; c < 5; ++c) {
-            if (clip_line(&camera->frustum.planes[c], p, p + 1, &result)) {
-                
-            }
-        }
-        
-        vec4_t sp[3];
-        sp[0] = world_to_screen_coords(p[0], camera);
-        sp[1] = world_to_screen_coords(p[1], camera);
-        sp[2] = world_to_screen_coords(p[2], camera);
         vertex_t v[3];
-        draw_triangle(v, mtl);
+        for (int c = 0; c < 3; ++c) {
+            vec4_t diff = vec4(0.f);
+            sub_vec4(&diff, p[c], &camera->pos);
+            normal_vec4(&diff, &vec4_copy(diff));
+        	if (dot_vec4(&diff, &triangle_normal) > 0.f) {
+        	    goto next; // backface culling
+        	}
+            
+        	// projection
+			v[c].pos = *p[c];
+			mul_mat_vec4(&v[c].pos, model, &vec4_copy(v[c].pos));
+			mul_mat_vec4(&v[c].pos, &projview, &vec4_copy(v[c].pos));
+			v[c].pos = project_to_screen(&v[c].pos, camera);
+        	
+        	// lighting
+            const float attenuation = fminf(fmaxf(0.f, -dot_vec4(&diff, n[c])), 1.f);
+            pow_vec4(&v[c].color, mtl ? &mtl->diffuse : &vec4(1.f), attenuation);
+			
+			// texture
+			v[c].uv = *t[c];
+        }
+		draw_triangle(v, mtl);
 next:
         continue;
     }

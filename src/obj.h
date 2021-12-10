@@ -2,6 +2,7 @@
 #define OBJ_H
 
 #include "vec4.h"
+#include "matrix.h"
 #include "camera.h"
 #include "mtl.h"
 #include <stdint.h>
@@ -28,6 +29,6 @@ typedef struct obj {
 
 obj_t* load_obj(obj_t* result, const char* filename);
 void free_obj(obj_t* obj);
-void draw_obj(const obj_t* obj, const camera_t* camera);
+void draw_obj(const obj_t* obj, const mat4x4_t* model, const camera_t* camera);
 
 #endif
