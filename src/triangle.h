@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
-typedef struct point {
+typedef struct vertex_t {
     float x; float y; float z;
     float r; float g; float b;
     float u; float v;
-} point_t;
+} vertex_t;
 
 typedef struct mtl mtl_t;
 
-void draw_triangle(point_t p0, point_t p1, point_t p2, mtl_t* mtl);
+void draw_triangle(vertex_t v[3], mtl_t* mtl);
 
 #endif

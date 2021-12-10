@@ -30,13 +30,14 @@ static inline void triangle_span(
     float u = u0 + u_inc * xoff; float v = v0 + v_inc * xoff;
     if (mtl && mtl->diffuse_texture.pixels) {
         for (int x = startx; x <= endx; ++x) {
-            if (check_depth(x, y, z)) {
+            const float recip = 1.f / z;
+            if (check_depth(x, y, recip)) {
                 const texture_t* t = &mtl->diffuse_texture;
-                const int ui = dmin(dmax(0, u * t->width), t->width);
-                const int vi = dmin(dmax(0, (1.f - v) * t->height), t->height);
+                const int ui = dmin(dmax(0, (u / z) * t->width), t->width);
+                const int vi = dmin(dmax(0, (1.f - (v / z)) * t->height), t->height);
                 uint32_t c = t->pixels[vi * t->width + ui];
                 pixel(x, y, color(((c & t->mask[0]) >> t->shift[0]) * r, ((c & t->mask[1]) >> t->shift[1]) * g, ((c & t->mask[2]) >> t->shift[2]) * b, 255));
-                write_depth(x, y, z);
+                write_depth(x, y, recip);
             }
             z += z_inc; r += r_inc; g += g_inc;
             b += b_inc; u += u_inc; v += v_inc;
@@ -53,39 +54,39 @@ static inline void triangle_span(
 }
 
 static inline void triangle_half(
-    const point_t p[3], int mode,
+    const vertex_t v[3], int mode,
     const int b[4], mtl_t* mtl
     ) {
     const int last_scan = 1 - mode;
-    int topy = (int)p[0].y < 0 ? 0 : ((int)p[0].y > YRES ? YRES : (int)p[0].y);
-    int boty = (int)p[2].y <= 0 ? -1 : ((int)p[2].y >= YRES ? YRES - 1 : (int)p[2].y);
+    int topy = (int)v[0].y < 0 ? 0 : ((int)v[0].y > YRES ? YRES : (int)v[0].y);
+    int boty = (int)v[2].y <= 0 ? -1 : ((int)v[2].y >= YRES ? YRES - 1 : (int)v[2].y);
     if (topy == YRES || boty == -1) {
         return;
     }
-    const float x_min = fmin(p[0].x, fmin(p[1].x, p[2].x)); const float x_max = fmax(p[0].x, fmax(p[1].x, p[2].x));
-    const float z_min = fmin(p[0].z, fmin(p[1].z, p[2].z)); const float z_max = fmax(p[0].z, fmax(p[1].z, p[2].z));
-    const float r_min = fmin(p[0].r, fmin(p[1].r, p[2].r)); const float r_max = fmax(p[0].r, fmax(p[1].r, p[2].r));
-    const float g_min = fmin(p[0].g, fmin(p[1].g, p[2].g)); const float g_max = fmax(p[0].g, fmax(p[1].g, p[2].g));
-    const float b_min = fmin(p[0].b, fmin(p[1].b, p[2].b)); const float b_max = fmax(p[0].b, fmax(p[1].b, p[2].b));
-    const float u_min = fmin(p[0].u, fmin(p[1].u, p[2].u)); const float u_max = fmax(p[0].u, fmax(p[1].u, p[2].u));
-    const float v_min = fmin(p[0].v, fmin(p[1].v, p[2].v)); const float v_max = fmax(p[0].v, fmax(p[1].v, p[2].v));
-    const float y_diff0 = 1.f / (p[b[0]].y - p[b[1]].y) * mode;
-    const float y_diff1 = 1.f / (p[b[2]].y - p[b[3]].y) * mode;
-    const float x_inc0 = (p[b[0]].x - p[b[1]].x) * y_diff0; const float x_inc1 = (p[b[2]].x - p[b[3]].x) * y_diff1;
-    const float z_inc0 = (p[b[0]].z - p[b[1]].z) * y_diff0; const float z_inc1 = (p[b[2]].z - p[b[3]].z) * y_diff1;
-    const float r_inc0 = (p[b[0]].r - p[b[1]].r) * y_diff0; const float r_inc1 = (p[b[2]].r - p[b[3]].r) * y_diff1;
-    const float g_inc0 = (p[b[0]].g - p[b[1]].g) * y_diff0; const float g_inc1 = (p[b[2]].g - p[b[3]].g) * y_diff1;
-    const float b_inc0 = (p[b[0]].b - p[b[1]].b) * y_diff0; const float b_inc1 = (p[b[2]].b - p[b[3]].b) * y_diff1;
-    const float u_inc0 = (p[b[0]].u - p[b[1]].u) * y_diff0; const float u_inc1 = (p[b[2]].u - p[b[3]].u) * y_diff1;
-    const float v_inc0 = (p[b[0]].v - p[b[1]].v) * y_diff0; const float v_inc1 = (p[b[2]].v - p[b[3]].v) * y_diff1;
-    const int yoff = mode > 0 ? abs(topy - (int)p[0].y) : abs(boty - (int)p[2].y);
-    float x0 = p[last_scan].x + x_inc0 * yoff; float x1 = p[last_scan].x + x_inc1 * yoff;
-    float z0 = p[last_scan].z + z_inc0 * yoff; float z1 = p[last_scan].z + z_inc1 * yoff;
-    float r0 = p[last_scan].r + r_inc0 * yoff; float r1 = p[last_scan].r + r_inc1 * yoff;
-    float g0 = p[last_scan].g + g_inc0 * yoff; float g1 = p[last_scan].g + g_inc1 * yoff;
-    float b0 = p[last_scan].b + b_inc0 * yoff; float b1 = p[last_scan].b + b_inc1 * yoff;
-    float u0 = p[last_scan].u + u_inc0 * yoff; float u1 = p[last_scan].u + u_inc1 * yoff;
-    float v0 = p[last_scan].v + v_inc0 * yoff; float v1 = p[last_scan].v + v_inc1 * yoff;
+    const float x_min = fmin(v[0].x, fmin(v[1].x, v[2].x)); const float x_max = fmax(v[0].x, fmax(v[1].x, v[2].x));
+    const float z_min = fmin(v[0].z, fmin(v[1].z, v[2].z)); const float z_max = fmax(v[0].z, fmax(v[1].z, v[2].z));
+    const float r_min = fmin(v[0].r, fmin(v[1].r, v[2].r)); const float r_max = fmax(v[0].r, fmax(v[1].r, v[2].r));
+    const float g_min = fmin(v[0].g, fmin(v[1].g, v[2].g)); const float g_max = fmax(v[0].g, fmax(v[1].g, v[2].g));
+    const float b_min = fmin(v[0].b, fmin(v[1].b, v[2].b)); const float b_max = fmax(v[0].b, fmax(v[1].b, v[2].b));
+    const float u_min = fmin(v[0].u, fmin(v[1].u, v[2].u)); const float u_max = fmax(v[0].u, fmax(v[1].u, v[2].u));
+    const float v_min = fmin(v[0].v, fmin(v[1].v, v[2].v)); const float v_max = fmax(v[0].v, fmax(v[1].v, v[2].v));
+    const float y_diff0 = 1.f / (v[b[0]].y - v[b[1]].y) * mode;
+    const float y_diff1 = 1.f / (v[b[2]].y - v[b[3]].y) * mode;
+    const float x_inc0 = (v[b[0]].x - v[b[1]].x) * y_diff0; const float x_inc1 = (v[b[2]].x - v[b[3]].x) * y_diff1;
+    const float z_inc0 = (v[b[0]].z - v[b[1]].z) * y_diff0; const float z_inc1 = (v[b[2]].z - v[b[3]].z) * y_diff1;
+    const float r_inc0 = (v[b[0]].r - v[b[1]].r) * y_diff0; const float r_inc1 = (v[b[2]].r - v[b[3]].r) * y_diff1;
+    const float g_inc0 = (v[b[0]].g - v[b[1]].g) * y_diff0; const float g_inc1 = (v[b[2]].g - v[b[3]].g) * y_diff1;
+    const float b_inc0 = (v[b[0]].b - v[b[1]].b) * y_diff0; const float b_inc1 = (v[b[2]].b - v[b[3]].b) * y_diff1;
+    const float u_inc0 = (v[b[0]].u - v[b[1]].u) * y_diff0; const float u_inc1 = (v[b[2]].u - v[b[3]].u) * y_diff1;
+    const float v_inc0 = (v[b[0]].v - v[b[1]].v) * y_diff0; const float v_inc1 = (v[b[2]].v - v[b[3]].v) * y_diff1;
+    const int yoff = mode > 0 ? abs(topy - (int)v[0].y) : abs(boty - (int)v[2].y);
+    float x0 = v[last_scan].x + x_inc0 * yoff; float x1 = v[last_scan].x + x_inc1 * yoff;
+    float z0 = v[last_scan].z + z_inc0 * yoff; float z1 = v[last_scan].z + z_inc1 * yoff;
+    float r0 = v[last_scan].r + r_inc0 * yoff; float r1 = v[last_scan].r + r_inc1 * yoff;
+    float g0 = v[last_scan].g + g_inc0 * yoff; float g1 = v[last_scan].g + g_inc1 * yoff;
+    float b0 = v[last_scan].b + b_inc0 * yoff; float b1 = v[last_scan].b + b_inc1 * yoff;
+    float u0 = v[last_scan].u + u_inc0 * yoff; float u1 = v[last_scan].u + u_inc1 * yoff;
+    float v0 = v[last_scan].v + v_inc0 * yoff; float v1 = v[last_scan].v + v_inc1 * yoff;
     const int starty = mode > 0 ? topy : boty;
     const int endy = mode > 0 ? boty : topy;
 #define BOUND(x0, x1, z0, z1, r0, r1, g0, g1, b0, b1, u0, u1, v0, v1)\
@@ -115,37 +116,46 @@ static inline void triangle_half(
     }
 }
 
-static inline void swap(point_t* p0, point_t* p1) {
-    point_t t = *p0;
-    *p0 = *p1;
-    *p1 = t;
+static inline void swap(vertex_t* v0, vertex_t* v1) {
+    vertex_t t = *v0;
+    *v0 = *v1;
+    *v1 = t;
 }
 
 #define TRIANGLE_TOP(P) triangle_half(P, 1, (int[4]){1, 0, 2, 0}, mtl)
 #define TRIANGLE_BOT(P) triangle_half(P, -1, (int[4]){2, 0, 2, 1}, mtl)
 
-void draw_triangle(point_t p0, point_t p1, point_t p2, mtl_t* mtl) {
-    point_t p[3] = {p0, p1, p2};
-    if (p[0].y > p[1].y) { swap(&p[0], &p[1]); }
-    if (p[1].y > p[2].y) { swap(&p[1], &p[2]); }
-    if (p[0].y > p[1].y) { swap(&p[0], &p[1]); }
-    if (p[1].y == p[2].y) {
-        TRIANGLE_TOP(p);
-    } else if (p[0].y == p[1].y) {
-        TRIANGLE_BOT(p);
+void perspective_correct(vertex_t* v) {
+    for (int c = 0; c < 3; ++c) {
+        const float z = v[c].z;
+        v[c].u = v[c].u / z;
+        v[c].v = v[c].v / z;
+        v[c].z = 1.f / z;
+    }
+}
+
+void draw_triangle(vertex_t v[3], mtl_t* mtl) {
+    perspective_correct(v);
+    if (v[0].y > v[1].y) { swap(&v[0], &v[1]); }
+    if (v[1].y > v[2].y) { swap(&v[1], &v[2]); }
+    if (v[0].y > v[1].y) { swap(&v[0], &v[1]); }
+    if (v[1].y == v[2].y) {
+        TRIANGLE_TOP(v);
+    } else if (v[0].y == v[1].y) {
+        TRIANGLE_BOT(v);
     } else {
-        point_t p3;
-        const float factor = (p[1].y - p[0].y) / (p[2].y - p[0].y);
-        p3.x = p[0].x + factor * (p[2].x - p[0].x);
-        p3.y = p[1].y;
-        p3.z = p[0].z + factor * (p[2].z - p[0].z);
-        p3.r = p[0].r + factor * (p[2].r - p[0].r);
-        p3.g = p[0].g + factor * (p[2].g - p[0].g);
-        p3.b = p[0].b + factor * (p[2].b - p[0].b);
-        p3.u = p[0].u + factor * (p[2].u - p[0].u);
-        p3.v = p[0].v + factor * (p[2].v - p[0].v);
-        point_t t0[3] = {p[0], p[1], p3};
-        point_t t1[3] = {p[1], p3, p[2]};
+        vertex_t v3;
+        const float factor = (v[1].y - v[0].y) / (v[2].y - v[0].y);
+        v3.x = v[0].x + factor * (v[2].x - v[0].x);
+        v3.y = v[1].y;
+        v3.z = v[0].z + factor * (v[2].z - v[0].z);
+        v3.r = v[0].r + factor * (v[2].r - v[0].r);
+        v3.g = v[0].g + factor * (v[2].g - v[0].g);
+        v3.b = v[0].b + factor * (v[2].b - v[0].b);
+        v3.u = v[0].u + factor * (v[2].u - v[0].u);
+        v3.v = v[0].v + factor * (v[2].v - v[0].v);
+        vertex_t t0[3] = {v[0], v[1], v3};
+        vertex_t t1[3] = {v[1], v3, v[2]};
         TRIANGLE_TOP(t0);
         TRIANGLE_BOT(t1);
     }

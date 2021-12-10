@@ -164,9 +164,6 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
             vec4_t diff = vec4(0.f);
             sub_vec4(&diff, p[i], &camera->pos);
             normal_vec4(&diff, &vec4_copy(diff));
-            if (dot_vec4(&diff, &camera_dir) <= 0.f) {
-                goto next; // cull triangles that would be projected backwards
-            }
             if (dot_vec4(&diff, &triangle_normal) > 0.f) {
                 goto next; // backface culling
             }
@@ -175,15 +172,28 @@ void draw_obj(const obj_t* obj, const camera_t* camera) {
             g[i] = (mtl ? mtl->diffuse.y : 1.f) * fmin(fmax(0.f, -dir), 1.f);
             b[i] = (mtl ? mtl->diffuse.z : 1.f) * fmin(fmax(0.f, -dir), 1.f);
         }
+        
+        int num_vertices = 0;
+        vertex_t v[32];
+        v[0] = (vertex_t){p[0]->x, p[0]->y, p[0]->z, r[0], g[0], b[0], t[0]->x, t[0]->y};
+        v[1] = (vertex_t){p[1]->x, p[1]->y, p[1]->z, r[1], g[1], b[1], t[1]->x, t[1]->y};
+        v[2] = (vertex_t){p[2]->x, p[2]->y, p[2]->z, r[2], g[2], b[2], t[2]->x, t[2]->y};
+        
+        float s;
+        float* result = &s;
+        bool dropped = false;
+        for (int c = 0; c < 5; ++c) {
+            if (clip_line(&camera->frustum.planes[c], p, p + 1, &result)) {
+                
+            }
+        }
+        
         vec4_t sp[3];
         sp[0] = world_to_screen_coords(p[0], camera);
         sp[1] = world_to_screen_coords(p[1], camera);
         sp[2] = world_to_screen_coords(p[2], camera);
-        point_t triangle[3];
-        triangle[0] = (point_t){sp[0].x, sp[0].y, sp[0].z, r[0], g[0], b[0], t[0]->x, t[0]->y};
-        triangle[1] = (point_t){sp[1].x, sp[1].y, sp[1].z, r[1], g[1], b[1], t[1]->x, t[1]->y};
-        triangle[2] = (point_t){sp[2].x, sp[2].y, sp[2].z, r[2], g[2], b[2], t[2]->x, t[2]->y};
-        draw_triangle(triangle[0], triangle[1], triangle[2], mtl);
+        vertex_t v[3];
+        draw_triangle(v, mtl);
 next:
         continue;
     }
