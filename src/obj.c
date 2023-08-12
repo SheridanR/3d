@@ -132,7 +132,7 @@ void free_obj(obj_t* obj) {
     }
 }
 
-void draw_obj(const obj_t* obj, const mat4x4_t* model, const const camera_t* camera) {
+void draw_obj(const obj_t* obj, const mat4x4_t* model, const camera_t* camera) {
     mat4x4_t projview;
     mul_mat(&projview, &camera->proj, &camera->view);
     vec4_t camera_dir = quat_to_vec3(&camera->ang);
