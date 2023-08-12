@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define FRAMES_PER_SECOND 165
+#define FRAMES_PER_SECOND 60
 extern uint8_t frames_to_do;
 extern uint64_t ticks;
 
